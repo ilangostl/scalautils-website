@@ -1,0 +1,79 @@
+@*
+ * Copyright 2010-2013 Artima, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import controllers.Application.latestScaladoc
+@import controllers.Application.latestVersion
+@import controllers.Application.milestoneVersion
+@import controllers.Application.milestoneJar
+@import controllers.Application.majorMinorScalaVersion
+
+@nonHomePage("Quick Start") {
+
+<div style="text-align: left">
+
+<h1>ScalaUtils quick start</h1>
+
+<p>
+To get started with ScalaUtils, first make sure you have ScalaUtils setup by following guide in <a href="@routes.Application.download.url">Download</a>
+</p>
+
+<p>
+If you have ScalaUtils Jar in your path, you could try it with Scala REPL:
+</p>
+
+<pre class="scala">
+$ scala -cp scalautils_2.10-2.0.RC1.jar
+Welcome to Scala version 2.10.2 (...).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> import org.scalautils.TripleEquals._
+import org.scalautils.TripleEquals._
+
+scala> 1 + 1 === 2
+res2: Boolean = true
+
+scala> 1 + 1 === 3
+res3: Boolean = false
+</pre>
+
+Alternatively, if you have ScalaUtils added to your sbt project, you can try it with with its Scala console:
+
+<pre class="scala">
+sbt> console
+[info] Starting scala interpreter...
+[info]
+Welcome to Scala version 2.10.2 (...).
+Type in expressions to have them evaluated.
+Type :help for more information.
+
+scala> import org.scalautils.TripleEquals._
+import org.scalautils.TripleEquals._
+
+scala> 1 + 1 === 2
+res0: Boolean = true
+
+scala> 1 + 1 === 3
+res1: Boolean = false
+</pre>
+
+<p>
+You are off and running! For more information, consult the <a href="@routes.UserGuide.userGuideIndex">user guide</a>.
+</p>
+
+</div>
+
+}

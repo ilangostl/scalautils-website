@@ -1,0 +1,35 @@
+@*
+* Copyright 2010-2013 Artima, Inc.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*@
+
+@import controllers.Application.milestoneScaladoc
+
+@userGuidePage("Equality Constraints") {
+    <div style="text-align: left">
+
+        <h1>Equality constraints</h1>
+
+            <p>
+                ScalaUtils also provides a way to get a compile-time type error if two types being compared with <code>===</code> don't adhere to a tunable
+                <a href="@{milestoneScaladoc}/index.html#org.scalautils.TripleEqualsSupport$$EqualityConstraint">EqualityConstraint</a>. By default you can compare any type with any type.
+                But you can use traits such as <a href="@{milestoneScaladoc}/index.html#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a>,
+                <a href="@{milestoneScaladoc}/index.html#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>,
+                and <a href="@{milestoneScaladoc}/index.html#org.scalautils.TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a> to get a
+                compile error when comparing, for example, an <code>Option[String]</code> with a <code>String</code> for equality. (<code>Equality</code> and
+                <code>TypeConstraint</code> are inspired in part by the <code>Equal</code> typeclass in <a href="https://github.com/scalaz/scalaz">scalaz</a>.)
+            </p>
+
+    </div>
+}

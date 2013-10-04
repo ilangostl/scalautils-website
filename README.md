@@ -1,4 +1,4 @@
 scalautils-website
 ==================
 
-ScalaTest Official Website
+ScalaUtils Official Website

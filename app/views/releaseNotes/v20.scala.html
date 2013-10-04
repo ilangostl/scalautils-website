@@ -1,0 +1,137 @@
+@*
+ * Copyright 2010-2013 Artima, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import controllers.Application.milestoneScaladoc
+@import controllers.Application.milestoneVersion
+
+@releaseNotesPage("ScalaTest 2.0.RC1 Release Notes") {
+<div style="text-align: left">
+
+<h1>ScalaUtils 2.0</h1>
+
+<h1>Equality</h1>
+
+<p>
+ScalaUtils allows you to customize what equality means for a type <code>T</code> by defining an
+<a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality"><code>Equality[T]</code></a> typeclass. This can be used with the <code>===</code> operator in
+production code and in tests, with assertions, the <code>should</code> <code>equal</code>, <code>shouldEqual</code>, and the <code>should</code> <code>===</code> matcher syntax.
+</p>
+
+<p>
+ScalaUtils defines a <a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality$">default <code>Equality</code></a> that will be used by default for any
+type <code>T</code> for which a more specific implicit <code>Equality[T]</code> is not available. The default equality will first call the <code>deep</code> method
+on an array on either the left or right side (or both sides), then use <code>==</code> to determine equality. This default is compatible with ScalaTest's existing
+<code>===</code> operator and <code>equal</code> and <code>be</code> matchers, so existing test code will continue to work as before.
+</p>
+
+<h1>Equality constraints</h1>
+
+<p>
+ScalaUtils also provides a way to get a compile-time type error if two types being compared with <code>===</code> don't adhere to a tunable
+<a href="@{milestoneScaladoc}/index.html#TripleEqualsSupport$$EqualityConstraint">EqualityConstraint</a>. By default you can compare any type with any type.
+But you can use traits such as <a href="@{milestoneScaladoc}/index.html#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a>,
+<a href="@{milestoneScaladoc}/index.html#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>,
+and <a href="@{milestoneScaladoc}/index.html#org.scalautils.TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a> to get a
+compile error when comparing, for example, an <code>Option[String]</code> with a <code>String</code> for equality. (<code>Equality</code> and
+<code>TypeConstraint</code> are inspired in part by the <code>Equal</code> typeclass in <a href="https://github.com/scalaz/scalaz">scalaz</a>.)
+</p>
+
+<h1>Tolerance</h1>
+
+<p>
+ScalaUtils also includes a <a href="@{milestoneScaladoc}/index.html#org.scalautils.Tolerance">Tolerance</a> trait that enables ScalaTest checking tolerances of
+numeric types with a <code>+-</code> symbolic operator.  In addition to:
+</p>
+
+<pre>
+result should be (2.0 +- 0.1)
+</pre>
+
+<p>
+You can now also use ScalaTest's <code>should equal</code>, <code>shouldEqual</code>, and <code>shouldBe</code> syntax:
+</p>
+
+<pre>
+result should equal (2.0 +- 0.1)
+result shouldEqual 2.0 +- 0.1
+result shouldBe 2.0 +- 0.1
+result should === (2.0 +- 0.1)
+</pre>
+
+<p>
+Or just with plain-old <code>===</code>, in an assertion in tests or just as part of a Boolean expression in production code: 
+</p>
+
+<pre>
+// In tests:
+assert(result === (3.0 +- 0.2))
+
+// In production code:
+if (result === (2.0 +- 0.1)) "close enough" else "sorry"
+</pre>
+
+<h1>Normalization</h1>
+
+<p>
+ScalaUtils also contains a <a href="@{milestoneScaladoc}/index.html#org.scalautils.Normalization"><code>Normalization</code></a> trait that allows you to
+define strategies for normalizing types. The <a href="@{milestoneScaladoc}/index.html#org.scalautils.NormalizingEquality"><code>NormalizingEquality</code></a> trait
+allows you to define an <code>Equality[T]</code> in terms of a normalization of that type <code>T</code> by first normalizing the left and, if
+also a <code>T</code>, the right hand side, then using a specified "after-normalization <code>Equality</code>" to compare the normalized values.
+</p>
+
+<h1>Explicitly</h1>
+
+<p>
+ScalaUtils also includes an <a href="@{milestoneScaladoc}/index.html#org.scalautils.Explicitly"><code>Explicitly</code></a> DSL for defining an
+implicit <code>Equality</code> parameter <em>explicitly</em>. If you want to customize equality for a type in general, you would usually want to place an
+implicit <code>Equality[T]</code> for that type in scope (or in <code>T</code>'s companion object). That implicit equality definition will then be picked
+up and used when that type is compared for equality with the <code>equal</code> matcher in tests and with <code>===</code> in both tests and production code.
+If you just want to use a custom equality for a single comparison, however, you may prefer to pass it explicitly. For example, if you have an implicit
+<code>Equality[String]</code> in scope, you can force a comparison to use the default equality with this syntax:
+</p>
+
+<pre>
+// In production code:
+if ((result === "hello")(decided by defaultEquality)) true else false
+
+// In tests:
+result should equal ("hello") (decided by defaultEquality)
+</pre>
+
+<p>
+The explicitly DSL also provides support for specifying a one-off equality that is based on a normalization. For example, ScalaUtils has a
+<a href="@{milestoneScaladoc}/index.html#org.scalautils.StringNormalizations"><code>StringNormalizations</code></a> trait that provides <code>trimmed</code> and
+<code>lowerCased</code> methods that return <code>Normalization[String]</code>s that normalize by trimming and lower-casing, respectively. If you bring those into
+scope by mixing in or importing the members of <code>StringNormalizations</code>, you could use the explicitly DSL like this:
+</p>
+
+<pre>
+// In production code:
+if ((result === "hello")(after being lowerCased)) true else false
+
+// In tests:
+result should equal ("hello") (after being lowerCased and trimmed)
+</pre>
+
+<p>
+ScalaUtils also includes a few other items, such as <a href="@{milestoneScaladoc}/index.html#org.scalautils.Catcher"><code>Catcher</code></a>, an extractor factory;
+<a href="@{milestoneScaladoc}/index.html#org.scalautils.Prettifier"><code>Prettifier</code></a>
+and <a href="@{milestoneScaladoc}/index.html#org.scalautils.PrettyMethods"><code>PrettyMethods</code></a>, for defining alternate <code>toString</code> implementations;
+and <a href="@{milestoneScaladoc}/index.html#org.scalautils.TimesOnInt"><code>TimesOnInt</code></a>, a counting loop moved from <code>org.scalatest</code>.
+</p>
+
+</div>
+}

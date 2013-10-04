@@ -1,0 +1,35 @@
+@*
+ * Copyright 2010-2013 Artima, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import controllers.Application.milestoneVersion
+@import controllers.Application.milestoneJar
+@import controllers.Application.majorMinorScalaVersion
+@import controllers.Application.milestoneScaladoc
+
+@homePage("Home") {
+
+    <div style="text-align: left">
+
+        <p>
+            ScalaUtils is focused on aspects of equality, normalization, and tolerance that may make sense to use in your production code as well as your tests. The
+            <code>org.scalautils</code> package is included in the ScalaTest jar, but is also available separately in a ScalaUtils jar. The idea is you can add a dependency
+            on ScalaUtils in your production classpath, so you can use it in your production code without having ScalaTest on the classpath. You should never
+            include ScalaTest in your production classpath, because when ScalaTest doesn't like something it tends to throw a <code>TestFailedException</code>. ScalaUtils will
+            always be released alongside ScalaTest, with version numbers that match exactly. So when ScalaTest 2.1 is released, for example, ScalaUtils 2.1 will also be released.
+        </p>
+
+    </div>
+}

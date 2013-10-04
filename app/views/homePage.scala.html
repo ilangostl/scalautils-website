@@ -1,0 +1,32 @@
+@*
+ * Copyright 2010-2013 Artima, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@(pagename: String)(body: => Html)
+
+@topImage = {
+
+      <div class="message">
+        <img src="@routes.Assets.at("images/scalaUtilsHeading.gif")" width="700"
+             height="200" alt="ScalaUtils: Simply Productive"/>
+      </div>
+<p style="align: center">
+Just Released - ScalaUtils <a href="/download#20rc1">2.0.RC1</a>.  For a glimpse of what's coming in ScalaUtils 2.0, check out the <a href="/release_notes/2.0">2.0.RC1 release notes</a> and
+this video on <a href="http://functional.tv/post/62456792600/funconf1-bill-venners-scalatest-20">Implicit Conversions =&gt; Implicit Parameters in ScalaTest 2.0</a>.
+</p>
+}
+
+@main(pagename, topImage){@body}
+
