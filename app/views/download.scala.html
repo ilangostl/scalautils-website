@@ -28,9 +28,16 @@
 central Maven repository as well).
 
 <p>
-ScalaUtils is a small library of utilities used by ScalaTest 2.0 that are useful in your production code as well as your tests. A copy of ScalaUtils is
-included in ScalaTest's jar file.  You can use ScalaUtils alone without ScalaTest in your production code, here is the information for including ScalaUtils
-in your project:
+ScalaUtils is a small library of utilities released as part of the <a href="http://www.scalatest.org/">ScalaTest</a> project that are useful in production both code and tests.
+For every release of ScalaTest, there is a corresponding release of ScalaUtils with the same version number.
+Thus if you use both ScalaUtils and ScalaTest in the same project, you should make sure the version numbers match.
+</p>
+
+<p>
+A copy of ScalaUtils is
+included in <a href="http://www.scalatest.org/">ScalaTest</a>'s jar file, so if you are using ScalaTest as your test framework, you need not include a copy of ScalaUtils
+in your test class path. If you want to use use ScalaUtils in your production code, or in your tests when using a test framework other
+than ScalaTest, you'll need to add it explicitly to your class path. Here is the information for including ScalaUtils in your project:
 </p>
 
 <ul>
