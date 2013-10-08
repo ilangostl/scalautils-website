@@ -18,18 +18,194 @@
 @import controllers.Application.milestoneJar
 @import controllers.Application.majorMinorScalaVersion
 @import controllers.Application.milestoneScaladoc
+@import controllers.Application.latestScaladoc
 
 @homePage("Home") {
 
-    <div style="text-align: left">
+  <div style="text-align: left">
 
-        <p>
-            ScalaUtils is focused on aspects of equality, normalization, and tolerance that may make sense to use in your production code as well as your tests. The
-            <code>org.scalautils</code> package is included in the ScalaTest jar, but is also available separately in a ScalaUtils jar. The idea is you can add a dependency
-            on ScalaUtils in your production classpath, so you can use it in your production code without having ScalaTest on the classpath. You should never
-            include ScalaTest in your production classpath, because when ScalaTest doesn't like something it tends to throw a <code>TestFailedException</code>. ScalaUtils will
-            always be released alongside ScalaTest, with version numbers that match exactly. So when ScalaTest 2.1 is released, for example, ScalaUtils 2.1 will also be released.
-        </p>
+    <p>
+      The ScalaUtils library is focused on constructs related to quality that are useful in both production
+      code and tests. Although <a href="scalatest.org">ScalaTest</a> is tightly integrated with ScalaUtils, you can use ScalaUtils
+      with any Scala project and any test framework. The ScalaUtils library has no dependencies other than Scala itself.
+    </p>
 
-    </div>
+    <h1>The <code>===</code> and <code>!==</code> operators</h1>
+
+    <p>
+      ScalaUtils provides a powerful <code>===</code> operator (and its complement, <code>!==</code>) that allows you to
+    </p>
+
+    <ul>
+    <li>Customize equality for a type outside its class,</li>
+    <li>Get compiler errors for equality comparisons that would always be false at runtime,</li>
+    <li>Compare numeric values for equality with a tolerance,</li>
+    <li>Normalize values before comparing them for equality</li>
+    </ul>
+
+    <p>
+    For example, you can compare strings for equality after being normalized by forcing them to lowercase by customizing
+    <a href="@latestScaladoc/#org.scalautils.Equality"><code>Equality</code></a> explicitly, like this:
+    </p>
+
+    <pre class="scala">
+    import org.scalautils._
+    import TripleEquals._
+    import StringNormalizations._
+    import Explicitly._
+
+    (<span class="quotedString">"Hello"</span> === <span class="quotedString">"hello"</span>) (after being lowerCased) <span class="lineComment">// true</span>
+    </pre>
+
+    <p>
+    You can also define implicit <a href="@latestScaladoc/#org.scalautils.Normalization"><code>Normalization</code></a> strategies for types and access
+    them by invoking <code>norm</code>:
+    </p>
+
+    <pre class="scala">
+    import NormMethods._
+
+    <span class="reserved">implicit</span> <span class="reserved">val</span> strNormalization = lowerCased
+
+    <span class="quotedString">"WHISPER"</span>.norm                                <span class="lineComment">// "whisper"</span>
+    <span class="quotedString">"WHISPER"</span>.norm === <span class="quotedString">"whisper"</span>                  <span class="lineComment">// true</span>
+    </pre>
+
+    <p>
+    The &ldquo;<code>after being lowerCased</code>&rdquo; syntax shown previously is provided by ScalaUtils'
+    <a href="@latestScaladoc/#org.scalautils.Explicitly"><code>Explicitly</code></a> DSL, which allows you to specify <code>Equality</code>
+    explicitly. You can also define custom <code>Equality</code>s implicitly:
+    </p>
+
+    <pre class="scala">
+    <span class="reserved">implicit</span> <span class="reserved">val</span> strEquality =
+      decided by defaultEquality[<span class="type">String</span>] afterBeing lowerCased
+
+    <span class="quotedString">"Hello"</span> === <span class="quotedString">"hello"</span>                           <span class="lineComment">// true</span>
+    <span class="quotedString">"normalized"</span> === <span class="quotedString">"NORMALIZED"</span>                 <span class="lineComment">// true</span>
+    </pre>
+
+    <p>
+    You can compare doubles for equality with a <a href="@latestScaladoc/#org.scalautils.Tolerance"><code>Tolerance</code></a>, like this:
+    </p>
+
+    <pre class="scala">
+    import Tolerance._
+
+    <span class="literal">2.00001</span> === <span class="literal">2.0</span> +- <span class="literal">0.01</span>                       <span class="lineComment">// true</span>
+    </pre>
+
+    <p>
+    Or you could use <a href="@latestScaladoc/#org.scalautils.TolerantNumerics"><code>TolerantNumerics</code></a> define an implicit <code>Equality[Double]</code> that 
+    compares <code>Double</code>s with a tolerance:
+    </p>
+
+    <pre class="scala">
+    import TolerantNumerics._
+
+    <span class="reserved">implicit</span> <span class="reserved">val</span> dblEquality = tolerantDoubleEquality(<span class="literal">0.01</span>)
+
+    <span class="literal">2.00001</span> === <span class="literal">2.0</span>                               <span class="lineComment">// true</span>
+    </pre>
+
+    <p>
+    A compiler error for an equality comparison that would always yield false looks like:
+    </p>
+
+    <pre class="scala">
+    import TypeCheckedTripleEquals._
+
+    <span class="type">Some</span>(<span class="quotedString">"hi"</span>) === <span class="quotedString">"hi"</span>
+    error: types Some[String] and String do not adhere to the type constraint
+    selected for the === and !== operators; the missing implicit parameter is
+    of type org.scalautils.Constraint[Some[String],String]
+              Some("hi") === "hi"
+                         ^
+    </pre>
+
+    <h1><code>Or</code> and <code>Every</code></h1>
+
+    <p>
+      ScalaUtils provides an &ldquo;<code>Either</code> with attitude&rdquo; named <a href="@latestScaladoc/#org.scalautils.Or"><code>Or</code></a>, which gives you
+      more convenient chaining of <code>map</code> and <code>flatMap</code> calls (and <code>for</code> expressions) than <code>Either</code> and, when, combined
+      with <a href="@latestScaladoc/#org.scalautils.Every"><code>Every</code></a>, enables you to accumulate errors. <code>Every</code> is an ordered
+      collection of one or more elements. An <code>Or</code> is either <a href="@latestScaladoc/#org.scalautils.Good"><code>Good</code></a> or
+      <a href="@latestScaladoc/#org.scalautils.Bad"><code>Bad</code></a>. An <code>Every</code> is either
+      <a href="@latestScaladoc/#org.scalautils.One"><code>One</code></a> or <a href="@latestScaladoc/#org.scalautils.Many"><code>Many</code></a>. Here's an
+      example of accumulating errors with <code>Or</code> and <code>Every</code>:
+    </p>
+
+<pre class="scala">
+import org.scalautils._
+import Accumulation._
+
+<span class="reserved">case</span> <span class="reserved">class</span> <span class="type">Person</span>(name: <span class="type">String</span>, age: <span class="type">Int</span>)
+
+<span class="reserved">def</span> parseName(input: <span class="type">String</span>): <span class="type">String</span> <span class="type">Or</span> <span class="type">One[ErrorMessage]</span> = {
+  <span class="reserved">val</span> trimmed = input.trim
+  <span class="reserved">if</span> (!trimmed.isEmpty)
+    <span class="type">Good</span>(trimmed)
+  <span class="reserved">else</span>
+    <span class="type">Bad</span>(<span class="type">One</span>(s<span class="quotedString">&quot;&quot;&quot;&quot;${input}&quot; is not a valid name&quot;&quot;&quot;</span>))
+}
+
+<span class="reserved">def</span> parseAge(input: <span class="type">String</span>): <span class="type">Int</span> <span class="type">Or</span> <span class="type">One[ErrorMessage]</span> = {
+  <span class="reserved">try</span> {
+    <span class="reserved">val</span> age = input.trim.toInt
+    <span class="reserved">if</span> (age &gt;= <span class="literal">0</span>) <span class="type">Good</span>(age) <span class="reserved">else</span> <span class="type">Bad</span>(<span class="type">One</span>(s<span class="quotedString">&quot;&quot;&quot;&quot;${age}&quot; is not a valid age&quot;&quot;&quot;</span>))
+  }
+  <span class="reserved">catch</span> {
+    <span class="reserved">case</span> _: <span class="type">NumberFormatException</span> =&gt;
+      <span class="type">Bad</span>(<span class="type">One</span>(s<span class="quotedString">&quot;&quot;&quot;&quot;${input}&quot; is not a valid integer&quot;&quot;&quot;</span>))
+  }
+}
+
+<span class="reserved">def</span> parsePerson(inputName: <span class="type">String</span>,
+      inputAge: <span class="type">String</span>): <span class="type">Person</span> <span class="type">Or</span> <span class="type">Every[ErrorMessage]</span> = {
+
+  <span class="reserved">val</span> name = parseName(inputName)
+  <span class="reserved">val</span> age = parseAge(inputAge)
+  withGood(name, age) { <span class="type">Person</span>(_, _) }
+}
+</pre>
+
+
+<p>
+Here are some examples of <code>parsePerson</code> in action:
+</p>
+
+<pre class="scala">
+parsePerson(<span class="quotedString">&quot;Bridget Jones&quot;</span>, <span class="quotedString">&quot;29&quot;</span>)
+<span class="lineComment">// Result: Good(Person(Bridget Jones,29))</span>
+<br />parsePerson(<span class="quotedString">&quot;Bridget Jones&quot;</span>, <span class="quotedString">&quot;&quot;</span>)
+<span class="lineComment">// Result: Bad(One(&quot;&quot; is not a valid integer))</span>
+<br />parsePerson(<span class="quotedString">&quot;Bridget Jones&quot;</span>, <span class="quotedString">&quot;-29&quot;</span>)
+<span class="lineComment">// Result: Bad(One(&quot;-29&quot; is not a valid age))</span>
+<br />parsePerson(<span class="quotedString">&quot;&quot;</span>, <span class="quotedString">&quot;&quot;</span>)
+<span class="lineComment">// Result: Bad(Many(&quot;&quot; is not a valid name, &quot;&quot; is not a valid integer))</span>
+</pre>
+
+<p>
+<code>Or</code> offers several other ways to accumulate errors besides the <code>withGood</code> methods shown in the example above. See the
+<a href="@latestScaladoc/#org.scalautils.Or">documentation for <code>Or</code></a> for more information.
+</p>
+
+    <h1>And more...</h1>
+
+<p>
+ScalaUtils also includes a <a href="@latestScaladoc/#org.scalautils.TimesOnInt"><code>TimesOnInt</code></a> trait that allows you to perform
+side-effecting loops a specified number of times, like this:
+</p>
+
+<pre class="scala">
+import TimesOnInt._
+
+<span class="literal">3</span> times println(<span class="quotedString">"hello "</span>) <span class="lineComment">// Output: hello hello hello</span>
+</pre>
+
+<p>
+You can also define an alternate <code>String</code> forms for types using <a href="@latestScaladoc/#org.scalautils.Prettifier"><code>Prettifier</code></a>s
+and create extractors for <code>Throwable</code>s <a href="@latestScaladoc/#org.scalautils.Catcher"><code>Catcher</code></a> factory.
+</p>
+
 }
