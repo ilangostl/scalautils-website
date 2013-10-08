@@ -57,6 +57,7 @@ List(1, 2, 3) === Set(1, 2, 3)
 </pre>
 
 <p>
+You should see the output shown below.
 By importing the members of <code>org.scalautils.TypeCheckedTripleEquals</code>, you get a <code>===</code> operator that requires
 the left- and right-hand types to be a subtype and/or supertype of each other:
 </p>
@@ -110,8 +111,8 @@ scala&gt; 1 === 1L
 <p>
 The previous expression would yield <code>true</code> if allowed to compile because the <code>Int</code> would be implicitly
 widened to <code>Long</code> via an implicit conversion in <code>scala.Predef</code>. Importing the members of
-<code>ConversionCheckedTripleEquals</code> will give you a <code>===</code> operator that requires the left- and right-hand
-types to be a subtype or supertype of each other, or that an implicit conversion exists in one direction or the other:
+<code>ConversionCheckedTripleEquals</code> will give you a <code>===</code> operator that requires that either the left- and right-hand
+types to be a subtype or supertype of each other, or an implicit conversion exists in one direction or the other:
 </p>
 
 <pre class="scala">
@@ -129,7 +130,7 @@ res3: Boolean = true
 </pre>
 
 <p>
-The following expression doesn't compile because <code>List[Int]</code> and <code>Vector[Int]</code> are not a subtype or
+The following expression does <em>not</em> compile, however, because <code>List[Int]</code> and <code>Vector[Int]</code> are not a subtype or
 supertype of each other, and no implicit conversion exists between them:
 </p>
 
@@ -178,6 +179,35 @@ information, see the documentation for <a href="@latestScaladoc/#org.scalautils.
 <a href="@latestScaladoc/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>, and
 <a href="@latestScaladoc/#org.scalautils.TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a>.
 </p>
+
+<p>
+Like ScalaTest, ScalaUtils consists if discrete traits so that you can import only the implicits you need, minimizing potential conflicts and
+maximizing compiler speed. If you decide you'll want certain features of ScalaUtils generally, you can mix them into a singleton object and
+just import its members. Here's an example:
+</p>
+
+<pre class="stHighlighted">
+<span class="stReserved">package</span> com.mycompany.myproject
+
+<span class="stReserved">import</span> org.scalautils._
+
+<span class="stReserved">object</span> <span class="stType">OurScalaUtils</span> <span class="stReserved">extends</span> <span class="stType">TypeCheckedTripleEquals</span>
+    <span class="stReserved">with</span> <span class="stType">TraversableEqualityConstraints</span> <span class="stReserved">with</span> <span class="stType">Tolerance</span>
+    <span class="stReserved">with</span> <span class="stType">Explicitly</span> <span class="stReserved">with</span> <span class="stType">TimesOnInt</span>
+</pre>
+
+<p>
+You can now import your desired ScalaUtils functionality in one line:
+</p>
+
+<pre class="stHighlighted">
+<span class="stReserved">package</span> com.mycompany.myproject
+
+<span class="stReserved">import</span> OurScalaUtils._
+
+<span class="stLineComment">// Your code here</span>
+</pre>
+
 
 <p>
 To include ScalaUtils in your sbt project, simply add this line:
