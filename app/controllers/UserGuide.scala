@@ -44,16 +44,16 @@ object UserGuide extends Controller {
     Ok(views.html.userGuide.Explicitly())
   }
 
+  def orAndEvery = Action {
+    Ok(views.html.userGuide.OrAndEvery())
+  }
+
   def catcher = Action {
     Ok(views.html.userGuide.Catcher())
   }
 
   def prettifier = Action {
     Ok(views.html.userGuide.Prettifier())
-  }
-
-  def prettyMethods = Action {
-    Ok(views.html.userGuide.PrettyMethods())
   }
 
   def timesOnInt = Action {

@@ -22,35 +22,17 @@
 <h1>Tolerance</h1>
 
 <p>
-ScalaUtils also includes a <a href="@{milestoneScaladoc}/index.html#org.scalautils.Tolerance">Tolerance</a> trait that enables checking tolerances of numeric types with a
-<code>+-</code> symbolic operator in ScalaTest.  In addition to:
+Trait containing an implicit conversion that adds a <code>+-</code> method to <code>Numeric</code> types, which enables
+spreads to be expressed in terms of a <em>pivot</em> and <em>tolerance</em>.
 </p>
-
-<pre class="scala">
-result should be (2.0 +- 0.1)
-</pre>
 
 <p>
-You can now also use Tolerance with ScalaTest <code>should equal</code>, <code>shouldEqual</code>, and <code>shouldBe</code> syntax:
+For example, the <code>TripleEquals</code> trait (and its type-checking siblings <code>TypeCheckedTripleEquals</code> and
+<code>ConversionCheckedTripleEquals</code>) enable you to write:
 </p>
 
-<pre class="scala">
-result should equal (2.0 +- 0.1)
-result shouldEqual 2.0 +- 0.1
-result shouldBe 2.0 +- 0.1
-result should === (2.0 +- 0.1)
-</pre>
-
-<p>
-Or just with plain-old <code>===</code>, in an assertion in tests or just as part of a Boolean expression in production code:
-</p>
-
-<pre class="scala">
-// In tests:
-assert(result === (3.0 +- 0.2))
-
-// In production code:
-if (result === (2.0 +- 0.1)) "close enough" else "sorry"
+<pre class="stHighlighted">
+a === (1.0 +- 0.1)
 </pre>
 
 </div>

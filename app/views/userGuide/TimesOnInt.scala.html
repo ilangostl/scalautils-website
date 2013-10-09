@@ -17,13 +17,58 @@
 @import controllers.Application.milestoneScaladoc
 
 @userGuidePage("TimesOnInt") {
-    <div style="text-align: left">
+<div style="text-align: left">
 
-        <h1>TimesOnInt</h1>
+<h1>TimesOnInt</h1>
 
-        <p>
-            Please see <a href="@{milestoneScaladoc}/index.html#org.scalautils.TimesOnInt"><code>TimesOnInt</code></a>.
-        </p>
+<p>
+Trait providing an implicit conversion that adds a <code>times</code> method to <code>Int</code>s that
+will repeat a given side-effecting operation multiple times.
+</p>
 
-    </div>
+<p>
+Here's an example in which a friendly greeting is printed three times:
+</p>
+
+<pre class="stHighlighted">
+3 times println("Hello again, world!")
+</pre>
+
+<p>
+Running the above code would yield this output:
+</p>
+
+<pre class="stExamples">
+Hello again, world!
+Hello again, world!
+Hello again, world!
+</pre>
+
+<p>
+If you need to repeat a block of statements multiple times, just enclose them in parentheses, like this:
+</p>
+
+<pre class="stHighlighted">
+2 times {
+  print("Hello ")
+  print("again, ")
+  println("world!")
+}
+</pre>
+
+<p>
+Running the above code would yield:
+</p>
+
+<pre class="stExamples">
+Hello again, world!
+Hello again, world!
+</pre>
+
+<p>
+This trait enables <code>times</code> to be invoked on 0 and any positive integer,
+but attempting to invoke <code>times</code> on a negative integer will result in an <code>IllegalArgumentException</code>.
+</p>
+
+</div>
 }

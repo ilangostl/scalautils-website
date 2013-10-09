@@ -14,19 +14,64 @@
 * limitations under the License.
 *@
 
-@import controllers.Application.milestoneScaladoc
+@import controllers.Application.latestScaladoc
 
 @userGuidePage("Normalization") {
-    <div style="text-align: left">
+<div style="text-align: left">
 
-        <h1>Normalization</h1>
+<h1>Normalization</h1>
 
-        <p>
-            ScalaUtils also contains a <a href="@{milestoneScaladoc}/index.html#org.scalautils.Normalization"><code>Normalization</code></a> trait that allows you to
-            define strategies for normalizing types. The <a href="@{milestoneScaladoc}/index.html#org.scalautils.NormalizingEquality"><code>NormalizingEquality</code></a> trait
-            allows you to define an <code>Equality[T]</code> in terms of a normalization of that type <code>T</code> by first normalizing the left and, if
-            also a <code>T</code>, the right hand side, then using a specified "after-normalization <code>Equality</code>" to compare the normalized values.
-        </p>
+<p>
+Defines a custom way to normalize instances of a type.
+</p>
+
+<p>
+For example, to normalize <code>Double</code>s by truncating off any decimal part,
+you might write:
+</p>
+
+<pre class="stHighlighted">
+<span class="stReserved">import</span> org.scalautils._
+
+<span class="stReserved">val</span> truncated =
+  <span class="stReserved">new</span> Normalization[Double] {
+    <span class="stReserved">def</span> normalized(d: Double) = d.floor
+  }
+</pre>
+
+<p>
+Given this definition you could use it with the <a href="@routes.UserGuide.explicitly.url"><code>Explicitly DSL</code></a> like this:
+</p>
+
+<pre class="stHighlighted">
+<span class="stReserved">import</span> org.scalatest._
+<span class="stReserved">import</span> Matchers._
+<span class="stReserved">import</span> TypeCheckedTripleEquals._
+
+(2.1 should === (2.0)) (after being truncated)
+</pre>
+
+<p>
+Note that to use a <code>Normalization</code> with the <code>Explicitly</code> DSL, you'll need to be using either
+<a href="@{latestScaladoc}/#org.scalautils.TypeCheckedTripleEquals" target="_blank"><code>TypeCheckedTripleEquals</code></a> or
+<a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals" target="_blank"><code>ConversionCheckedTripleEquals</code></a>.
+If you're just using plain-old <a href="@{latestScaladoc}/#org.scalautils.TripleEquals" target="_blank"><code>TripleEquals</code></a>,
+you'll need a <a href="@{latestScaladoc}/#org.scalautils.Uniformity" target="_blank"><code>Uniformity</code></a>, a <code>Normalization</code> subclass.
+</p>
+
+<p>
+If you make the <code>truncated</code> <code>val</code> implicit and import or mix in the members of
+<a href="@{latestScaladoc}/#org.scalautils.NormMethods" target="_blank"><code>NormMethods</code></a>,
+you can access the behavior by invoking <code>.norm</code> on <code>Double</code>s.
+</p>
+
+<pre class="stHighlighted">
+<span class="stReserved">implicit</span> <span class="stReserved">val</span> doubleNormalization = truncated
+<span class="stReserved">import</span> NormMethods._
+
+<span class="stReserved">val</span> d = 2.1
+d.norm // returns 2.0
+</pre>
 
 </div>
 }
