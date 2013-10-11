@@ -24,12 +24,16 @@ object UserGuide extends Controller {
     Ok(views.html.userGuide.userGuideIndex())
   }
 
-  def equality = Action {
-    Ok(views.html.userGuide.Equality())
+  def customEquality = Action {
+    Ok(views.html.userGuide.customEquality())
   }
 
-  def equalityConstraints = Action {
-    Ok(views.html.userGuide.EqualityConstraints())
+  def defaultEquality = Action {
+    Ok(views.html.userGuide.defaultEquality())
+  }
+
+  def constrainedEquality = Action {
+    Ok(views.html.userGuide.constrainedEquality())
   }
 
   def tolerance = Action {

@@ -13,8 +13,9 @@ GET        /release_notes                         controllers.ReleaseNotes.relea
 
 GET        /release_notes/2.0                     controllers.ReleaseNotes.v20
 
-GET        /user_guide/Equality                   controllers.UserGuide.equality
-GET        /user_guide/EqualityConstraints        controllers.UserGuide.equalityConstraints
+GET        /user_guide/CustomEquality             controllers.UserGuide.customEquality
+GET        /user_guide/DefaultEquality            controllers.UserGuide.defaultEquality
+GET        /user_guide/ConstrainedEquality        controllers.UserGuide.constrainedEquality
 GET        /user_guide/Tolerance                  controllers.UserGuide.tolerance
 GET        /user_guide/Normalization              controllers.UserGuide.normalization
 GET        /user_guide/Explicitly                 controllers.UserGuide.explicitly

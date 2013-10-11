@@ -16,10 +16,10 @@
 
 @import controllers.Application.latestScaladoc
 
-@userGuidePage("Equality Constraints") {
+@userGuidePage("Constrained Equality") {
 <div style="text-align: left">
 
-<h1>Equality constraints</h1>
+<h1>Constrained equality</h1>
 
 <p>
 Equality constraints provides a way to get a compile-time type error if two types being compared with <code>===</code> don't adhere to a tunable
@@ -28,7 +28,7 @@ But you can use traits such as <a href="#TypeCheckedTripleEquals"><code>TypeChec
 <a href="#ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>, <a href="#TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a>,
 <a href="#SeqEqualityConstraints"><code>SeqEqualityConstraints</code></a>, <a href="#SetEqualityConstraints"><code>SetEqualityConstraints</code></a> and
 <a href="#MapEqualityConstraints"><code>MapEqualityConstraints</code></a> to get a compile error when comparing, for example, an <code>Option[String]</code> with a <code>String</code>
-for equality. (<code>Equality</code> and <code>EqualityConstraint</code> are inspired in part by the <code>Equal</code> typeclass in <a href="https://github.com/scalaz/scalaz" target="_blank">scalaz</a>.)
+for equality. 
 </p>
 
 <a name="TypeCheckedTripleEquals"></a>

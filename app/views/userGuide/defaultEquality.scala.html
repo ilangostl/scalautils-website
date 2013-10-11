@@ -16,33 +16,18 @@
 
 @import controllers.Application.latestScaladoc
 
-@userGuidePage("Equality") {
+@userGuidePage("Default equality") {
 <div style="text-align: left">
 
-<h1>Equality</h1>
-
+<h1>Default equality</h1>
 <p>
-Defines a custom way to determine equality for a type when compared with another value of type <code>Any</code>.
+ScalaUtils defines a default <code>Equality</code> that treats arrays specially. Its <code>areEqual</code> method works by first
+calling <code>.deep</code> on any passed array, then calling <code>==</code> on the resulting left-hand object, passing in the resulting right-hand object.
+If a more specific implicit <code>Equality</code> is not available for the left-hand type in an <code>===</code> or <code>!==</code> expression, 
+default equality will be used.
 </p>
-
 <p>
-<code>Equality</code> enables you to define alternate notions of equality for types that can be used
-with ScalaUtil's <code>===</code> and <code>!==</code> syntax and ScalaTest's matcher syntax.
-</p>
-
-<p>
-For example, say you have a case class that includes a <code>Double</code> value:
-</p>
-
-<pre class="stExamples">
-scala&gt; case class Person(name: String, age: Double)
-defined class Person
-</pre>
-
-<p>
-Imagine you are calculating the <code>age</code> values in such as way that occasionally tests
-are failing because of rounding differences that you actually don't care about. For example, you
-expect an age of 29.0, but you're sometimes seeing 29.0001:
+Here are some examples showing the special treatment of arrays:
 </p>
 
 <pre class="stExamples">
@@ -52,63 +37,40 @@ import org.scalautils._
 scala&gt; import TripleEquals._
 import TripleEquals._
 
-scala&gt; Person("Joe", 29.0001) === Person("Joe", 29.0)
+scala&gt; Array(1, 2, 3) == Array(1, 2, 3)
 res0: Boolean = false
-</pre>
 
-<p>
-The <code>===</code> operator looks for an implicit <code>Equality[L]</code>, where <code>L</code> is the left-hand type: in this
-case, <code>Person</code>. Because you didn't specifically provide an implicit <code>Equality[Person]</code>, <code>===</code> will fall back on
-<a href="#defaultEquality">default equality</a>, which will call <code>Person</code>'s <code>equals</code> method. That <code>equals</code> method, provided by the Scala compiler
-because <code>Person</code> is a case class, will declare these two objects unequal because 29.001 does not exactly equal 29.0.
-</p>
-
-<p>
-To make the equality check more forgiving, you could define an implicit <code>Equality[Person]</code> that compares
-the <code>age</code> <code>Double</code>s with a tolerance, like this:
-</p>
-
-<pre class="stExamples">
-scala&gt; import Tolerance._
-import Tolerance._
-
-scala&gt; implicit val personEq =
-     |   new Equality[Person] {
-     |     def areEqual(a: Person, b: Any): Boolean =
-     |       b match {
-     |         case p: Person =&gt; a.name == p.name &amp;&amp; a.age === p.age +- 0.0002
-     |         case _ =&gt; false
-     |       }
-     |   }
-personEq: org.scalautils.Equality[Person] = $anon$1@@2b29f6e7
-</pre>
-
-<p>
-Now the <code>===</code> operator will use your more forgiving <code>Equality[Person]</code> for the equality check instead
-of default equality:
-</p>
-
-<pre class="stExamples">
-scala&gt; Person("Joe", 29.0001) === Person("Joe", 29.0)
+scala&gt; Array(1, 2, 3) === Array(1, 2, 3)
 res1: Boolean = true
+
+scala&gt; Array(1, 2, 3) == List(1, 2, 3)
+&lt;console&gt;:14: warning: comparing values of types Array[Int] and List[Int] using `==' will always yield false
+              Array(1, 2, 3) == List(1, 2, 3)
+                             ^
+res2: Boolean = false
+
+scala&gt; Array(1, 2, 3) === List(1, 2, 3)
+res3: Boolean = true
+
+scala&gt; List(1, 2, 3) == Array(1, 2, 3)
+res4: Boolean = false
+
+scala&gt; List(1, 2, 3) === Array(1, 2, 3)
+res5: Boolean = true
 </pre>
 
-<a name="defaultEquality"></a>
-<h2>Default equality</h2>
-
 <p>
-ScalaUtils defines a default <code>Equality[T]</code> for all types <code>T</code> whose <code>areEqual</code> method works by first
-calling <code>.deep</code> on any passed array, then calling <code>==</code> on the left-hand object, passing in the right-hand object.
-You can obtain a default equality via the <code>default</code> method of the <a href="@{latestScaladoc}/#org.scalautils.Equality$" target="_blank">
+You can obtain a default equality via the <code>default</code> method of the <a href="@{latestScaladoc}/#org.scalautils.Equality$">
 Equality companion object</a>, or from the <code>defaultEquality</code> method defined in
-<a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport" target="_blank"><code>TripleEqualsSupport</code></a>.
+<a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport"><code>TripleEqualsSupport</code></a>.
 </p>
 
+<!--
 <a name="aboutEquality"></a>
 <h2>About equality and equivalence</h2>
 
 <p>
-The <code>Equality</code> trait represents the Java Platform's native notion of equality, as expressed in the signature and contract of
+ScalaUtils' <code>Equality</code> trait represents the Java Platform's native notion of equality, as expressed in the signature and contract of
 the <code>equals</code> method of <code>java.lang.Object</code>. Essentially, trait <code>Equality</code> enables you to write alternate
 <code>equals</code> method implementations for a type outside its defining class.
 </p>
@@ -191,9 +153,10 @@ is required, because <code>Equality</code> extends <code>Equivalence</code>, def
 <a href="http://github.com/scalaz/scalaz" target="_blank"><code>scalaz</code></a> project.</em>
 </p>
 
-<p>
-Next, learn about <a href="@routes.UserGuide.equalityConstraints.url">Equality Constraints</a>.
-</p>
+-->
 
+<p>
+Next, learn about <a href="@routes.UserGuide.constrainedEquality.url">Constrained equality</a>.
+</p>
 </div>
 }
