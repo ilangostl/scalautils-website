@@ -22,8 +22,69 @@
 <h1>Constrained equality</h1>
 
 <p>
-Equality constraints provides a way to get a compile-time type error if two types being compared with <code>===</code> don't adhere to a tunable
-<a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport$$EqualityConstraint" target="_blank">EqualityConstraint</a>. By default you can compare any type with any type.
+ScalaUtils provides a way to get a compile-time type error if two types being compared with <code>===</code> don't adhere to a tunable type
+<a href="@{latestScaladoc}/#org.scalautils.Constraint"><code>Constraint</code></a>. The basic <a href="@{latestScaladoc}/#org.scalautils.TripleEquals"><code>TripleEquals</code></a> trait allows you to compare any
+type for equality with any other type:
+</p>
+
+<pre class="stExamples">
+scala&gt; import org.scalautils._
+import org.scalautils._
+
+scala&gt; import TripleEquals._
+import TripleEquals._
+
+scala&gt; Some(1) === 2
+res0: Boolean = false
+
+scala&gt; 1 === 1L
+res1: Boolean = true
+</pre>
+
+<p>
+<a href="@{latestScaladoc}/#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a> will compile only if the left and right sides are in a subtype/supertype relationship (including
+when the left and right sides are exactly the same type):
+</p>
+
+<pre class="stExamples">
+scala&gt; import TypeCheckedTripleEquals._
+import TypeCheckedTripleEquals._
+
+scala&gt; Some(1) === 2
+&lt;console&gt;:17: error: types Some[Int] and Int do not adhere to the type constraint selected for the === and !== operators;
+    the missing implicit parameter is of type org.scalautils.Constraint[Some[Int],Int]
+              Some(1) === 2
+
+scala&gt; 1 === 1L
+&lt;console&gt;:17: error: types Int and Long do not adhere to the type constraint selected for the === and !== operators;
+    the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
+              1 === 1L
+                ^
+</pre>
+
+<p>
+<a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a> will compile if the left and right sides are in a subtype/supertype relationship or
+an implicit conversion exists between the left and right sides:
+</p>
+
+<pre class="stExamples">
+scala&gt; import ConversionCheckedTripleEquals._
+import ConversionCheckedTripleEquals._
+
+scala&gt; Some(1) === 2
+&lt;console&gt;:20: error: types Some[Int] and Int do not adhere to the type constraint selected for the === and !== operators;
+    the missing implicit parameter is of type org.scalautils.Constraint[Some[Int],Int]
+              Some(1) === 2
+                      ^
+
+scala&gt; 1 === 1L
+res5: Boolean = true
+</pre>
+
+<p>
+</p>
+
+<p>
 But you can use traits such as <a href="#TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a>,
 <a href="#ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>, <a href="#TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a>,
 <a href="#SeqEqualityConstraints"><code>SeqEqualityConstraints</code></a>, <a href="#SetEqualityConstraints"><code>SetEqualityConstraints</code></a> and
@@ -108,7 +169,7 @@ res2: Boolean = true
 
 <p>
 This trait will override or hide implicit methods defined by its sibling traits,
-<a href="@{latestScaladoc}/#org.scalautils.TripleEquals" target="_blank"><code>TripleEquals</code></a> or <a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals" target="_blank"><code>ConversionCheckedTripleEquals</code></a>,
+<a href="@{latestScaladoc}/#org.scalautils.TripleEquals"><code>TripleEquals</code></a> or <a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>,
 and can therefore be used to temporarily turn on or off conversion checking in a limited scope. Here's an example, in which <code>TypeCheckedTripleEquals</code> will
 cause a compiler error:
 </p>
@@ -184,7 +245,7 @@ expression in the other overloaded <code>cmp</code> method that takes strings.
 
 <p>
 Because the methods in <code>ConversionCheckedTripleEquals</code> (and its siblings)
-<em>override</em> all the methods defined in supertype <a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport" target="_blank"><code>TripleEqualsSupport</code></a>, you can achieve the same
+<em>override</em> all the methods defined in supertype <a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport"><code>TripleEqualsSupport</code></a>, you can achieve the same
 kind of nested tuning of equality constraints whether you mix in traits, import from companion objects, or use some combination of both.
 </p>
 
@@ -214,7 +275,7 @@ the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
 </pre>
 
 <p>
-Although you could solve the above type error with <a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals" target="_blank"><code>ConversionCheckedTripleEquals</code></a>, you could also
+Although you could solve the above type error with <a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>, you could also
 simply widen the type of one side or the other to <code>Any</code>. Because <code>Any</code> is a supertype of everything, the
 type constraint will be satisfied:
 </p>
@@ -319,8 +380,8 @@ res2: Boolean = true
 
 <p>
 This trait will override or hide implicit methods defined by its sibling traits,
-<a href="@{latestScaladoc}/#org.scalautils.TripleEquals" target="_blank"><code>TripleEquals</code></a> or
-<a href="@{latestScaladoc}/#org.scalautils.TypeCheckedTripleEquals" target="_blank"><code>TypeCheckedTripleEquals</code></a>,
+<a href="@{latestScaladoc}/#org.scalautils.TripleEquals"><code>TripleEquals</code></a> or
+<a href="@{latestScaladoc}/#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a>,
 and can therefore be used to temporarily turn on or off conversion checking in a limited scope. Here's an example, in which
 <code>TypeCheckedTripleEquals</code> will cause a compiler error:
 </p>
@@ -396,7 +457,7 @@ expression in the other overloaded <code>cmp</code> method that takes strings.
 
 <p>
 Because the methods in <code>ConversionCheckedTripleEquals</code> (and its siblings)
-<em>override</em> all the methods defined in supertype <a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport" target="_blank"><code>TripleEqualsSupport</code></a>, you can achieve the same
+<em>override</em> all the methods defined in supertype <a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport"><code>TripleEqualsSupport</code></a>, you can achieve the same
 kind of nested tuning of equality constraints whether you mix in traits, import from companion objects, or use some combination of both.
 </p>
 
@@ -427,7 +488,7 @@ scala&gt; List(1, 2, 3) === Vector(1, 2, 3)
 </pre>
 
 <p>
-Although you could solve the above type error with <a href="@{latestScaladoc}/#org.scalautils.TraversableEqualityConstraints" target="_blank"><code>TraversableEqualityConstraints</code></a>,
+Although you could solve the above type error with <a href="@{latestScaladoc}/#org.scalautils.TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a>,
 you could also simply widen the type of one side or the other to <code>Any</code>. Because <code>Any</code> is a supertype of everything, the type constraint will be satisfied:
 </p>
 
