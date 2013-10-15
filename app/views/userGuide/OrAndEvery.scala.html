@@ -22,16 +22,12 @@
 <h1>Or and Every</h1>
 
 <p>
-The <code>Or</code> and <code>Every</code> types of ScalaUtils allow you to represent errors as an alternate return
-value (like <code>Either</code>) and to optionally accumulate errors.
-<code>Or</code> represents a value that is one of two possible types, with one type being &ldquo;good&rdquo; and
-the other &ldquo;bad.&rdquo;
-</p>
-
-<p>
-An <code>Or</code> will either be a &ldquo;good&rdquo; value wrapped in an instance of
-<a href="@{latestScaladoc}/#org.scalautils.Good" target="_blank"><code>Good</code></a> or a &ldquo;bad&rdquo; value wrapped in an instance
-of <a href="@{latestScaladoc}/#org.scalautils.Bad" target="_blank"><code>Bad</code></a>.
+The <code>Or</code> and <code>Every</code> types of ScalaUtils allow you to represent errors as an &ldquo;alternate return
+value&rdquo; (like <code>Either</code>) and to optionally accumulate errors.
+<code>Or</code> represents a value that is one of two possible types, with one type being &ldquo;good&rdquo;
+(a value wrapped in an instance of <a href="@{latestScaladoc}/#org.scalautils.Good"><code>Good</code></a>)
+and the other &ldquo;bad&rdquo;
+(a value wrapped in an instance of <a href="@{latestScaladoc}/#org.scalautils.Bad"><code>Bad</code></a>).
 </p>
 
 <h2>The motivation for <code>Or</code></h2>
@@ -226,7 +222,7 @@ You can think of the <code>String</code> <code>Or</code> <code>ErrorMessage</cod
 type like this:
 </p>
 
-<blockquote class="quotedString">
+<blockquote>
 <em>The <code>parseName</code> method will return a name <code>String</code> or, if the input string
 is not a valid name, an <code>ErrorMessage</code>.</em>
 </blockquote>
@@ -285,11 +281,11 @@ parsePerson("", "")
 
 <p>
 Another difference between <code>Or</code> and <code>Either</code> is that <code>Or</code> enables
-you to accumulate errors if the <code>Bad</code> type is an <a href="@{latestScaladoc}/#org.scalautils.Every" target="_blank"><code>Every</code></a>.
+you to accumulate errors if the <code>Bad</code> type is an <a href="@{latestScaladoc}/#org.scalautils.Every"><code>Every</code></a>.
 An <code>Every</code> is similar to a <code>Seq</code> in that it contains ordered elements, but
 different from <code>Seq</code> in that it cannot be empty. An <code>Every</code> is
-either a <a href="@{latestScaladoc}/#org.scalautils.One" target="_blank"><code>One</code></a>,
-which contains one and only one element, or a <a href="@{latestScaladoc}/#org.scalautils.Many" target="_blank"><code>Many</code></a>, which contains two or
+either a <a href="@{latestScaladoc}/#org.scalautils.One"><code>One</code></a>,
+which contains one and only one element, or a <a href="@{latestScaladoc}/#org.scalautils.Many"><code>Many</code></a>, which contains two or
 more elements.
 </p>
 
@@ -331,7 +327,7 @@ Because <code>parseName</code> will either return a valid name <code>String</cod
 <p>
 Because a <code>for</code> expression short-circuits on the first <code>Bad</code> encountered, you'll
 need to use a different approach to write the <code>parsePerson</code> method. In this example, the
-<code>withGood</code> method from trait <a href="@{latestScaladoc}/#org.scalautils.Accumulation" target="_blank"><code>Accumulation</code></a>
+<code>withGood</code> method from trait <a href="@{latestScaladoc}/#org.scalautils.Accumulation"><code>Accumulation</code></a>
 will do the trick:
 </p>
 
@@ -382,7 +378,100 @@ parsePerson("", "")
 Note that in the last example, the <code>Bad</code> contains an error message for both name and age.
 </p>
 
-XXX
+<h2>Working with <code>Every</code>s</h2>
+
+<p>
+The previous examples demonstrate constructing a one-element <code>Every</code> with
+a factory method in the <code>One</code> companion object. You can similarly create an <code>Every</code> that contains more than one
+using a <code>Many</code> factory method. Here are some examples:
+</p>
+
+<pre class="stHighlighted">
+One(1)
+Many(1, 3)
+Many(1, 2, 3)
+</pre>
+
+<p>
+You can also construct an <code>Every</code> by passing one or more elements to the <code>Every.apply</code> factory method:
+</p>
+
+<pre class="stHighlighted">
+Every(1)
+Every(1, 2)
+Every(1, 2, 3)
+</pre>
+
+<p>
+<code>Every</code> does not extend Scala's <code>Seq</code> or <code>Traversable</code> traits because these require that
+implementations may be empty. For example, if you invoke <code>tail</code> on a <code>Seq</code> that contains just one element,
+you'll get an empty <code>Seq</code>:
+</p>
+
+<pre class="stExamples">
+scala&gt; List(1).tail
+res6: List[Int] = List()
+</pre>
+
+<p>
+On the other hand, many useful methods exist on <code>Seq</code> that when invoked on a non-empty <code>Seq</code> are guaranteed
+to not result in an empty <code>Seq</code>. For convenience, <code>Every</code> defines a method corresponding to every such <code>Seq</code>
+method. Here are some examples:
+</p>
+
+<pre class="stHighlighted">
+Many(1, 2, 3).map(_ + 1)                  // Result: Many(2, 3, 4)
+One(1).map(_ + 1)                         // Result: One(2)
+Every(1, 2, 3).containsSlice(Every(2, 3)) // Result: true
+Every(1, 2, 3).containsSlice(Every(3, 4)) // Result: false
+Every(-1, -2, 3, 4, 5).minBy(_.abs)       // Result: -1
+</pre>
+
+<p>
+<code>Every</code> does <em>not</em> currently define any methods corresponding to <code>Seq</code> methods that could result in
+an empty <code>Seq</code>. However, an implicit converison from <code>Every</code> to <code>collection.immutable.IndexedSeq</code>
+is defined in the <code>Every</code> companion object that will be applied if you attempt to call one of the missing methods. As a
+result, you can invoke <code>filter</code> on an <code>Every</code>, even though <code>filter</code> could result
+in an empty sequence&mdash;but the result type will be <code>collection.immutable.IndexedSeq</code> instead of <code>Every</code>:
+</p>
+
+<pre class="stHighlighted">
+Every(1, 2, 3).filter(_ &lt; 10) // Result: Vector(1, 2, 3)
+Every(1, 2, 3).filter(_ &gt; 10) // Result: Vector()
+</pre>
+
+
+<p>
+You can use <code>Every</code>s in <code>for</code> expressions. The result will be an <code>Every</code> unless
+you use a filter (an <code>if</code> clause). Because filters are desugared to invocations of <code>filter</code>, the
+result type will switch to a <code>collection.immutable.IndexedSeq</code> at that point. Here are some examples:
+</p>
+
+<pre class="stExamples">
+scala&gt; import org.scalautils._
+import org.scalautils._
+
+scala&gt; for (i &lt;- Every(1, 2, 3)) yield i + 1
+res0: org.scalautils.Every[Int] = Many(2, 3, 4)
+
+scala&gt; for (i &lt;- Every(1, 2, 3) if i &lt; 10) yield i + 1
+res1: scala.collection.immutable.IndexedSeq[Int] = Vector(2, 3, 4)
+
+scala&gt; for {
+     |   i &lt;- Every(1, 2, 3)
+     |   j &lt;- Every('a', 'b', 'c')
+     | } yield (i, j)
+res3: org.scalautils.Every[(Int, Char)] =
+        Many((1,a), (1,b), (1,c), (2,a), (2,b), (2,c), (3,a), (3,b), (3,c))
+
+scala&gt; for {
+     |   i &lt;- Every(1, 2, 3) if i &lt; 10
+     |   j &lt;- Every('a', 'b', 'c')
+     | } yield (i, j)
+res6: scala.collection.immutable.IndexedSeq[(Int, Char)] =
+        Vector((1,a), (1,b), (1,c), (2,a), (2,b), (2,c), (3,a), (3,b), (3,c))
+</pre>
+
 
 <h2>Other ways to accumulate errors</h2>
 
@@ -573,109 +662,6 @@ res6: org.scalautils.Or[AnyVal,String] = Good(3)
 scala&gt; Bad("oops"): Int Or ErrorMessage
 res7: org.scalautils.Or[Int,org.scalautils.ErrorMessage] = Bad(oops)
 </pre>
-
-<h2>Constructing <code>Every</code>s</h2>
-
-<p>
-You can construct an <code>Every</code> by passing one or more elements to the <code>Every.apply</code> factory method:
-</p>
-
-<pre class="stHighlighted">
-Every(1)
-Every(1, 2)
-Every(1, 2, 3)
-</pre>
-
-<p>
-Alternatively you can pass one element to the <code>One.apply</code> factory method, or two or more elements to
-<code>Many.apply</code>:
-</p>
-
-<pre class="stHighlighted">
-One(1)
-Many(1, 3)
-Many(1, 2, 3)
-</pre>
-
-<h2>Working with <code>Every</code>s</h2>
-
-<p>
-<code>Every</code> does not extend Scala's <code>Seq</code> or <code>Traversable</code> traits because these require that
-implementations may be empty. For example, if you invoke <code>tail</code> on a <code>Seq</code> that contains just one element,
-you'll get an empty <code>Seq</code>:
-</p>
-
-<pre class="stExamples">
-scala&gt; List(1).tail
-res6: List[Int] = List()
-</pre>
-
-<p>
-On the other hand, many useful methods exist on <code>Seq</code> that when invoked on a non-empty <code>Seq</code> are guaranteed
-to not result in an empty <code>Seq</code>. For convenience, <code>Every</code> defines a method corresponding to every such <code>Seq</code>
-method. Here are some examples:
-</p>
-
-<pre class="stHighlighted">
-Many(1, 2, 3).map(_ + 1)                  // Result: Many(2, 3, 4)
-One(1).map(_ + 1)                         // Result: One(2)
-Every(1, 2, 3).containsSlice(Every(2, 3)) // Result: true
-Every(1, 2, 3).containsSlice(Every(3, 4)) // Result: false
-Every(-1, -2, 3, 4, 5).minBy(_.abs)       // Result: -1
-</pre>
-
-<p>
-<code>Every</code> does <em>not</em> currently define any methods corresponding to <code>Seq</code> methods that could result in
-an empty <code>Seq</code>. However, an implicit converison from <code>Every</code> to <code>collection.immutable.IndexedSeq</code>
-is defined in the <code>Every</code> companion object that will be applied if you attempt to call one of the missing methods. As a
-result, you can invoke <code>filter</code> on an <code>Every</code>, even though <code>filter</code> could result
-in an empty sequence&mdash;but the result type will be <code>collection.immutable.IndexedSeq</code> instead of <code>Every</code>:
-</p>
-
-<pre class="stHighlighted">
-Every(1, 2, 3).filter(_ &lt; 10) // Result: Vector(1, 2, 3)
-Every(1, 2, 3).filter(_ &gt; 10) // Result: Vector()
-</pre>
-
-
-<p>
-You can use <code>Every</code>s in <code>for</code> expressions. The result will be an <code>Every</code> unless
-you use a filter (an <code>if</code> clause). Because filters are desugared to invocations of <code>filter</code>, the
-result type will switch to a <code>collection.immutable.IndexedSeq</code> at that point. Here are some examples:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; for (i &lt;- Every(1, 2, 3)) yield i + 1
-res0: org.scalautils.Every[Int] = Many(2, 3, 4)
-
-scala&gt; for (i &lt;- Every(1, 2, 3) if i &lt; 10) yield i + 1
-res1: scala.collection.immutable.IndexedSeq[Int] = Vector(2, 3, 4)
-
-scala&gt; for {
-     |   i &lt;- Every(1, 2, 3)
-     |   j &lt;- Every('a', 'b', 'c')
-     | } yield (i, j)
-res3: org.scalautils.Every[(Int, Char)] =
-        Many((1,a), (1,b), (1,c), (2,a), (2,b), (2,c), (3,a), (3,b), (3,c))
-
-scala&gt; for {
-     |   i &lt;- Every(1, 2, 3) if i &lt; 10
-     |   j &lt;- Every('a', 'b', 'c')
-     | } yield (i, j)
-res6: scala.collection.immutable.IndexedSeq[(Int, Char)] =
-        Vector((1,a), (1,b), (1,c), (2,a), (2,b), (2,c), (3,a), (3,b), (3,c))
-</pre>
-
-<h2>Motivation for <code>Every</code>s</h2>
-
-<p>
-Although <code>Every</code> is a general-purpose, non-empty ordered collection, it was motivated by the desire to enable easy
-accumulation of errors in <a href="#Or"><code>Or</code></a>s. For examples of <code>Every</code> used in that use case, see the
-<a href="#accumulatingErrors">Accumulating errors with <code>Or</code></a> section..
-</p>
 
 <p>
 Next, learn about <a href="@routes.UserGuide.catcher.url">Catcher</a>.
