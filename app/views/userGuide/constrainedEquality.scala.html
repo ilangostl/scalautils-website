@@ -22,7 +22,7 @@
 <h1>Constrained equality</h1>
 
 <p>
-ScalaUtils provides a way to get a compile-time type error if two types being compared with <code>===</code> don't adhere to a tunable type
+ScalaUtils provides a way to get a compile-time type error if two types being compared with <code>===</code> violate a tunable type
 <a href="@{latestScaladoc}/#org.scalautils.Constraint"><code>Constraint</code></a>. The basic <a href="@{latestScaladoc}/#org.scalautils.TripleEquals"><code>TripleEquals</code></a> trait allows you to compare any
 type for equality with any other type:
 </p>
@@ -63,8 +63,30 @@ scala&gt; 1 === 1L
 </pre>
 
 <p>
-<a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a> will compile if the left and right sides are in a subtype/supertype relationship or
-an implicit conversion exists between the left and right sides:
+Note that the latter case is an example of an over-protective type error. If this expression were allowed to compile and run, it would yield
+<code>true</code>, because the <code>Int</code> would be implicitly converted to <code>Long</code>. One way to solve such errors is with a type
+ascription. In this case, you can case either side to <code>AnyVal</code>, a supertype of both <code>Int</code> and <code>Long</code>:
+</p>
+
+<pre class="stExamples">
+scala&gt; 1 === (1L: AnyVal)
+res7: Boolean = true
+
+scala&gt; 1L === (1: AnyVal)
+res8: Boolean = true
+</pre>
+
+<p>
+Since every type is a subtype of <code>Any</code>, you can always solve an over-protective type error with a type ascription of <code>Any</code>.
+</p>
+
+<p>
+</p>
+<p>
+Another way to address this type error, since an implicit conversion exists between the two types, is to use
+<a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>.
+<code>ConversionCheckedTripleEquals</code> will compile if the left and right sides are
+in a subtype/supertype relationship <em>or</em> an implicit conversion exists between the left and right sides:
 </p>
 
 <pre class="stExamples">
@@ -82,767 +104,61 @@ res5: Boolean = true
 </pre>
 
 <p>
-</p>
-
-<p>
-But you can use traits such as <a href="#TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a>,
-<a href="#ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>, <a href="#TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a>,
-<a href="#SeqEqualityConstraints"><code>SeqEqualityConstraints</code></a>, <a href="#SetEqualityConstraints"><code>SetEqualityConstraints</code></a> and
-<a href="#MapEqualityConstraints"><code>MapEqualityConstraints</code></a> to get a compile error when comparing, for example, an <code>Option[String]</code> with a <code>String</code>
-for equality. 
-</p>
-
-<a name="TypeCheckedTripleEquals"></a>
-<h2>TypeCheckedTripleEquals</h2>
-
-<p>
-<code>TypeCheckedTripleEquals</code> delegate the equality determination to an <code>Equality</code> type class, and require the types of the two values
-compared to be in a subtype/supertype relationship.
-</p>
-
-<p class="stHighlighted">
-<strong>Recommended Usage</strong>:
-Trait <code>TypeCheckedTripleEquals</code> is useful (in both production and test code) when you need determine equality for a type of object differently
-than its <code>equals</code> method&#8212;either you can't change the <code>equals</code> method, or the <code>equals</code> method is sensible generally,
-but you're in a special situation where you need something else&#8212;and/or you want to enforce at compile-time that the types of the compared values are in a subtype/supertype relationship.
-</p>
-
-<p>
-This trait is the strictest of the three <em>triple equals</em> traits, enforcing a stronger constraint than
-both <code>TripleEquals</code> (the most lenient) and <code>ConversionCheckedTripleEquals</code> (the middle ground).
-If <code>TripleEquals</code> is mixed in or imported, the <code>===</code> can be used with any two types
-and still compile. If <code>TypeCheckedTripleEquals</code> is mixed in or imported, however, only types in
-a subtype or supertype relationship with each other (including when both types are exactly the same) will compile.
-<code>ConversionCheckedTripleEquals</code> is slightly more accomodating, because in addition to compiling any
-use of <code>===</code> that will compile under <code>TypeCheckedTripleEquals</code>, it will also compile
-type types that would be rejected by <code>TypeCheckedTripleEquals</code>, so long as an implicit
-conversion (in either direction) from one type to another is available.
-</p>
-
-<p>
-For example, under <code>TypeCheckedTripleEquals</code>, the following use of <code>===</code> will not compile,
-because <code>Int</code> and <code>Long</code> are not in a subtype/supertype relationship. (<em>I.e.</em>, <code>Int</code>
-is not a subtype or supertype of <code>Long</code>):
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedTripleEquals._
-
-scala&gt; 1 === 1L
-&lt;console&gt;:14: error: types Int and Long do not adhere to the equality constraint selected for
-the === and !== operators; they must either be in a subtype/supertype relationship, or, if
-ConversionCheckedTripleEquals is in force, implicitly convertible in one direction or the other;
-the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
-               1 === 1L
-                 ^
-</pre>
-
-<p>
-Trait <code>TypeCheckedTripleEquals</code> rejects types <code>Int</code> and <code>Long</code> because they are not directly related via
-subtyping. However, an implicit widening conversion from <code>Int</code> to <code>Long</code> does exist (imported implicitly from
-<code>scala.Predef</code>), so <code>ConversionCheckedTripleEquals</code>
-will allow it:
-</p>
-
-<pre class="stExamples">
-scala&gt; import ConversionCheckedTripleEquals._
-import ConversionCheckedTripleEquals._
-
-scala&gt; 1 === 1L
-res1: Boolean = true
-</pre>
-
-<p>
-The implicit conversion can go in either direction: from the left type to the right type, or vice versa. In the above expression the
-implicit conversion goes from left to right (the <code>Int</code> on the left to the <code>Long</code> on the right). It also works
-the other way:
+The comparison between <code>Int</code> and <code>Long</code> in the previous <code>ConversionCheckedTripleEquals</code> example compiles
+because an implicit widening conversion from <code>Int</code> to <code>Long</code> is defined in <code>scala.Predef</code>. The implicit conversion
+can be in either direction. In the previous example, it is from the left type (<code>Int</code>) to the right type (<code>Long</code>). Here
+the implicit conversion is from the right type (<code>Int</code>) to the left type (<code>Long</code>):
 </p>
 
 <pre class="stExamples">
 scala&gt; 1L === 1
-res2: Boolean = true
+res6: Boolean = true
 </pre>
 
 <p>
-This trait will override or hide implicit methods defined by its sibling traits,
-<a href="@{latestScaladoc}/#org.scalautils.TripleEquals"><code>TripleEquals</code></a> or <a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>,
-and can therefore be used to temporarily turn on or off conversion checking in a limited scope. Here's an example, in which <code>TypeCheckedTripleEquals</code> will
-cause a compiler error:
-</p>
-
-<pre class="stHighlighted">
-<span class="stReserved">import</span> org.scalautils._
-<span class="stReserved">import</span> TypeCheckedTripleEquals._
-
-<span class="stReserved">object</span> Example {
-
-  <span class="stReserved">def</span> cmp(a: Int, b: Long): Int = {
-    <span class="stReserved">if</span> (a === b) 0       // This line won't compile
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (a &lt; b) -1
-    <span class="stReserved">else</span> 1
-  }
-
-  <span class="stReserved">def</span> cmp(s: String, t: String): Int = {
-    <span class="stReserved">if</span> (s === t) 0
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (s &lt; t) -1
-    <span class="stReserved">else</span> 1
- }
-}
-</pre>
-
-<p>
-Because <code>Int</code> and <code>Long</code> are not in a subtype/supertype relationship, comparing <code>1</code> and <code>1L</code> in the context
-of <code>TypeCheckedTripleEquals</code> will generate a compiler error:
+Another way to solve over-protective type errors is to actually supply <code>Constraint</code> objects that will allow
+specific types causing the errors to compile. For example, ScalaUtils provides <code>Constraints</code> for Scala's collection
+types, whose equality behavior is not modeled by either <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>.
+If the following were allowed to compile, it would yield <code>true</code>, because two <code>Seq</code>s are considered equal
+if they contain equal elements in the same order:
 </p>
 
 <pre class="stExamples">
-Example.scala:9: error: types Int and Long do not adhere to the equality constraint selected for
-the === and !== operators; they must either be in a subtype/supertype relationship, or, if
-ConversionCheckedTripleEquals is in force, implicitly convertible in one direction or the other;
-the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
-if (a === b) 0      // This line won't compile
-      ^
-one error found
-</pre>
-
-<p>
-You can &ldquo;relax&rdquo; the type checking (<em>i.e.</em>, by additionally allowing implicitly convertible types) locally by importing
-the members of <code>ConversionCheckedTripleEquals</code> in a limited scope:
-</p>
-
-<pre class="stHighlighted">
-<span class="stReserved">package</span> org.scalautils.examples.conversioncheckedtripleequals
-
-<span class="stReserved">import</span> org.scalautils._
-<span class="stReserved">import</span> TypeCheckedTripleEquals._
-
-<span class="stReserved">object</span> Example {
-
-  <span class="stReserved">def</span> cmp(a: Int, b: Long): Int = {
-    <span class="stReserved">import</span> ConversionCheckedTripleEquals._
-    <span class="stReserved">if</span> (a === b) 0
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (a &lt; b) -1
-    <span class="stReserved">else</span> 1
-  }
-
-  <span class="stReserved">def</span> cmp(s: String, t: String): Int = {
-    <span class="stReserved">if</span> (s === t) 0
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (s &lt; t) -1
-    <span class="stReserved">else</span> 1
-  }
-}
-</pre>
-
-<p>
-With the above change, the <code>Example.scala</code> file compiles fine. Conversion checking is enabled only inside the first <code>cmp</code> method that
-takes an <code>Int</code> and a <code>Long</code>. <code>TypeCheckedTripleEquals</code> is still enforcing its type constraint, for example, for the <code>s === t</code>
-expression in the other overloaded <code>cmp</code> method that takes strings.
-</p>
-
-<p>
-Because the methods in <code>ConversionCheckedTripleEquals</code> (and its siblings)
-<em>override</em> all the methods defined in supertype <a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport"><code>TripleEqualsSupport</code></a>, you can achieve the same
-kind of nested tuning of equality constraints whether you mix in traits, import from companion objects, or use some combination of both.
-</p>
-
-<p>
-In short, you should be able to select a primary constraint level via either a mixin or import, then change that in nested scopes
-however you want, again either through a mixin or import, without getting any implicit conversion ambiguity. The innermost constraint level in scope
-will always be in force.
-</p>
-
-<p>
-An alternative way to solve an unwanted compiler error caused by an over-zealous type constraint is with a <em>widening type ascription</em>. Here
-are some examples:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedLegacyTripleEquals._
-
-scala&gt; 1 === 1L
-&lt;console&gt;:14: error: types Int and Long do not adhere to the equality constraint selected for the === and !== operators;
-the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
-              1 === 1L
-                ^
-</pre>
-
-<p>
-Although you could solve the above type error with <a href="@{latestScaladoc}/#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a>, you could also
-simply widen the type of one side or the other to <code>Any</code>. Because <code>Any</code> is a supertype of everything, the
-type constraint will be satisfied:
-</p>
-
-<pre class="stExamples">
-scala&gt; 1 === (1L: Any)
-res1: Boolean = true
-
-scala&gt; (1: Any) === 1L
-res2: Boolean = true
-</pre>
-
-<p>
-You could alternatively widen a type to a more specific common supertype than <code>Any</code>. For example, since <code>Int</code> and
-<code>Long</code> are both subtypes of <code>AnyVal</code>, you could widen either type to <code>AnyVal</code> to satisfy
-the type checker:
-</p>
-
-<pre class="stExamples">
-scala&gt; 1 === (1L: AnyVal)
-res3: Boolean = true
-
-scala&gt; (1: AnyVal) === 1L
-res4: Boolean = true
-</pre>
-
-<a name="ConversionCheckedTripleEquals"></a>
-<h2>ConversionCheckedTripleEquals</h2>
-
-<p>
-Provides <code>===</code> and <code>!==</code> operators that return <code>Boolean</code>, delegate the equality determination
-to an <code>Equality</code> type class, and require that either the types of the two values compared are in a subtype/supertype
-relationship, or that an implicit conversion is available that can convert from one type to the other.
-</p>
-
-<p class="stHighlighted">
-<strong>Recommended Usage</strong>:
-Trait <code>ConversionCheckedTripleEquals</code> is useful (in both production and test code) when you need determine equality for a type of object differently than
-its <code>equals</code> method&#8212;either you can't change the <code>equals</code> method, or the <code>equals</code> method is sensible generally, but you're in a
-special situation where you need something else&#8212;and/or you want a compile-time type check that allows types that are implicitly convertable in either (or both) directions.
-</p>
-
-<p>
-This trait is the middle ground of the three <em>triple equals</em> traits, in between
-<code>TripleEquals</code>, the most lenient, and <code>TypeCheckedTripleEquals</code>, the most strict.
-If <code>TripleEquals</code> is mixed in or imported, the <code>===</code> can be used with any two types
-and still compile. If <code>TypeCheckedTripleEquals</code> is mixed in or imported, however, only types in
-a subtype or supertype relationship with each other (including when both types are exactly the same) will compile.
-<code>ConversionCheckedTripleEquals</code> is slightly more accomodating, because in addition to compiling any
-use of <code>===</code> that will compile under <code>TypeCheckedTripleEquals</code>, it will also compile
-type types that would be rejected by <code>TypeCheckedTripleEquals</code>, so long as an implicit
-conversion (in either direction) from one type to another is available.
-</p>
-
-<p>
-For example, under <code>TypeCheckedTripleEquals</code>, the following use of <code>===</code> will not compile,
-because <code>Int</code> and <code>Long</code> are not in a subtype/supertype relationship. (<em>I.e.</em>, <code>Int</code>
-is not a subtype or supertype of <code>Long</code>):
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedTripleEquals._
-
-scala&gt; 1 === 1L
-&lt;console&gt;:14: error: types Int and Long do not adhere to the equality constraint selected for
-the === and !== operators; they must either be in a subtype/supertype relationship, or, if
-ConversionCheckedTripleEquals is in force, implicitly convertible in one direction or the other;
-the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
-              1 === 1L
-                ^
-</pre>
-
-<p>
-Trait <code>TypeCheckedTripleEquals</code> rejects types <code>Int</code> and <code>Long</code> because they are not directly related via
-subtyping. However, an implicit widening conversion from <code>Int</code> to <code>Long</code> does exist (imported implicitly from
-<code>scala.Predef</code>), so <code>ConversionCheckedTripleEquals</code>
-will allow it:
-</p>
-
-<pre class="stExamples">
-scala&gt; import ConversionCheckedTripleEquals._
-import ConversionCheckedTripleEquals._
-
-scala&gt; 1 === 1L
-res1: Boolean = true
-</pre>
-
-<p>
-The implicit conversion can go in either direction: from the left type to the right type, or vice versa. In the above expression the
-implicit conversion goes from left to right (the <code>Int</code> on the left to the <code>Long</code> on the right). It also works
-the other way:
-</p>
-
-<pre class="stExamples">
-scala&gt; 1L === 1
-res2: Boolean = true
-</pre>
-
-<p>
-This trait will override or hide implicit methods defined by its sibling traits,
-<a href="@{latestScaladoc}/#org.scalautils.TripleEquals"><code>TripleEquals</code></a> or
-<a href="@{latestScaladoc}/#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a>,
-and can therefore be used to temporarily turn on or off conversion checking in a limited scope. Here's an example, in which
-<code>TypeCheckedTripleEquals</code> will cause a compiler error:
-</p>
-
-<pre class="stHighlighted">
-<span class="stReserved">import</span> org.scalautils._
-<span class="stReserved">import</span> TypeCheckedTripleEquals._
-
-<span class="stReserved">object</span> Example {
-
-  <span class="stReserved">def</span> cmp(a: Int, b: Long): Int = {
-    <span class="stReserved">if</span> (a === b) 0       // This line won't compile
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (a &lt; b) -1
-    <span class="stReserved">else</span> 1
-  }
-
-  <span class="stReserved">def</span> cmp(s: String, t: String): Int = {
-    <span class="stReserved">if</span> (s === t) 0
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (s &lt; t) -1
-    <span class="stReserved">else</span> 1
- }
-}
-</pre>
-
-<p>
-Because <code>Int</code> and <code>Long</code> are not in a subtype/supertype relationship, comparing <code>1</code> and <code>1L</code> in the context
-of <code>TypeCheckedTripleEquals</code> will generate a compiler error:
-</p>
-
-<pre class="stExamples">
-Example.scala:9: error: types Int and Long do not adhere to the equality constraint selected for
-the === and !== operators; they must either be in a subtype/supertype relationship, or, if
-ConversionCheckedTripleEquals is in force, implicitly convertible in one direction or the other;
-the missing implicit parameter is of type org.scalautils.Constraint[Int,Long]
-    if (a === b) 0      // This line won't compile
-          ^
-one error found
-</pre>
-
-<p>
-You can &ldquo;relax&rdquo; the type checking (<em>i.e.</em>, by additionally allowing implicitly convertible types) locally by importing
-the members of <code>ConversionCheckedTripleEquals</code> in a limited scope:
-</p>
-
-<pre class="stHighlighted">
-package org.scalautils.examples.conversioncheckedtripleequals
-
-<span class="stReserved">import</span> org.scalautils._
-<span class="stReserved">import</span> TypeCheckedTripleEquals._
-
-<span class="stReserved">object</span> Example {
-
-  <span class="stReserved">def</span> cmp(a: Int, b: Long): Int = {
-    <span class="stReserved">import</span> ConversionCheckedTripleEquals._
-    <span class="stReserved">if</span> (a === b) 0
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (a &lt; b) -1
-    <span class="stReserved">else</span> 1
-  }
-
-  <span class="stReserved">def</span> cmp(s: String, t: String): Int = {
-    <span class="stReserved">if</span> (s === t) 0
-    <span class="stReserved">else</span> <span class="stReserved">if</span> (s &lt; t) -1
-    <span class="stReserved">else</span> 1
-  }
-}
-</pre>
-
-<p>
-With the above change, the <code>Example.scala</code> file compiles fine. Conversion checking is enabled only inside the first <code>cmp</code> method that
-takes an <code>Int</code> and a <code>Long</code>. <code>TypeCheckedTripleEquals</code> is still enforcing its type constraint, for example, for the <code>s === t</code>
-expression in the other overloaded <code>cmp</code> method that takes strings.
-</p>
-
-<p>
-Because the methods in <code>ConversionCheckedTripleEquals</code> (and its siblings)
-<em>override</em> all the methods defined in supertype <a href="@{latestScaladoc}/#org.scalautils.TripleEqualsSupport"><code>TripleEqualsSupport</code></a>, you can achieve the same
-kind of nested tuning of equality constraints whether you mix in traits, import from companion objects, or use some combination of both.
-</p>
-
-<p>
-In short, you should be able to select a primary constraint level via either a mixin or import, then change that in nested scopes
-however you want, again either through a mixin or import, without getting any implicit conversion ambiguity. The innermost constraint level in scope
-will always be in force.
-<p>
-
-<p>
-An alternative way to solve an unwanted compiler error caused by an over-zealous type constraint is with a <em>widening type ascription</em>. Here
-are some examples:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import ConversionCheckedTripleEquals._
-import ConversionCheckedTripleEquals._
-
 scala&gt; List(1, 2, 3) === Vector(1, 2, 3)
-&lt;console&gt;:14: error: types List[Int] and scala.collection.immutable.Vector[Int] do not adhere
-  to the equality constraint selected for the === and !== operators; the missing implicit parameter
-  is of type org.scalautils.Constraint[List[Int],scala.collection.immutable.Vector[Int]]
+&lt;console&gt;:14: error: types List[Int] and scala.collection.immutable.Vector[Int] do not adhere to the type constraint
+    selected for the === and !== operators; the missing implicit parameter is of type
+    org.scalautils.Constraint[List[Int],scala.collection.immutable.Vector[Int]]
               List(1, 2, 3) === Vector(1, 2, 3)
                             ^
 </pre>
 
 <p>
-Although you could solve the above type error with <a href="@{latestScaladoc}/#org.scalautils.TraversableEqualityConstraints"><code>TraversableEqualityConstraints</code></a>,
-you could also simply widen the type of one side or the other to <code>Any</code>. Because <code>Any</code> is a supertype of everything, the type constraint will be satisfied:
-</p>
-
-<pre class="stExamples">
-scala&gt; List(1, 2, 3) === (Vector(1, 2, 3): Any)
-res1: Boolean = true
-
-scala&gt; (List(1, 2, 3): Any) === Vector(1, 2, 3)
-res2: Boolean = true
-</pre>
-
-<p>
-You could alternatively widen a type to a more specific common supertype than <code>Any</code>. For example, since <code>List[Int]</code> and
-<code>Vector[Int]</code> are both subtypes of <code>Seq[Int]</code>, so you could widen either type to <code>Seq[Int]</code> to satisfy
-the type checker:
-</p>
-
-<pre class="stExamples">
-scala&gt; List(1, 2, 3) === (Vector(1, 2, 3): Seq[Int])
-res3: Boolean = true
-
-scala&gt; (List(1, 2, 3): Seq[Int]) === Vector(1, 2, 3)
-res4: Boolean = true
-</pre>
-
-<a name="TraversableEqualityConstraints"></a>
-<h2>TraversableEqualityConstraints</h2>
-
-<p>
-Provides three implicit methods that loosen the equality constraint defined by <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>
-for Scala <code>Traversable</code>s to one that more closely matches Scala's approach to <code>Traversable</code> equality.
-</p>
-
-<p>
-Scala's approach to <code>Traversable</code> equality is that if the objects being compared are ether both <code>Seq</code>s, both <code>Set</code>s,
-or both <code>Map</code>s, the elements are compared to determine equality.
-This means you could compare an immutable <code>Vector</code> and a mutable <code>ListBuffer</code> for equality, for instance, and get true so long as the
-two <code>Seq</code>s contained the same elements in the same order. Here's an example:
-</p>
-
-<pre class="stExamples">
-scala&gt; import scala.collection.mutable.ListBuffer
-import scala.collection.mutable.ListBuffer
-
-scala&gt; Vector(1, 2) == ListBuffer(1, 2)
-res0: Boolean = true
-</pre>
-
-<p>
-Such a comparison would not, however, compile if you used <code>===</code> under either <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>,
-because <code>Vector</code> and <code>ListBuffer</code> are not in a subtype/supertype relationship, nor does an implicit conversion by default exist between them:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedTripleEquals._
-
-scala&gt; Vector(1, 2) === ListBuffer(1, 2)
-&lt;console&gt;:16: error: types scala.collection.immutable.Vector[Int] and
-  scala.collection.mutable.ListBuffer[Int] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.Vector[Int],
-  scala.collection.mutable.ListBuffer[Int]]
-              Vector(1, 2) === ListBuffer(1, 2)
-                           ^
-</pre>
-
-<p>
-If you mix or import the implicit conversion provided by <code>TraversableEqualityConstraint</code>, however, the comparison will be allowed:
+Trait <code>TraversableEqualityConstraints</code> provides type constraints that allow <code>Seq</code>s to be compared with <code>Seq</code>s, 
+<code>Set</code>s with <code>Set</code>s, and <code>Map</code>s with <code>Map</code>s, so long as an equality constraint exists between
+the respective element types:
 </p>
 
 <pre class="stExamples">
 scala&gt; import TraversableEqualityConstraints._
 import TraversableEqualityConstraints._
 
-scala&gt; Vector(1, 2) === ListBuffer(1, 2)
-res2: Boolean = true
-</pre>
+scala&gt; List(1, 2, 3) === Vector(1, 2, 3)
+res1: Boolean = true
 
-<p>
-The equality constraints provided by this trait require that left and right sides are both subclasses of either <code>scala.collection.GenSeq</code>,
-<code>scala.collection.GenSet</code>, or <code>scala.collection.GenMap</code>, and that
-an <code>EqualityConstraint</code> can be found for the element types for <code>Seq</code> and <code>Set</code>, or the key and value types for <code>Map</code>s. In
-the example above, both the <code>Vector</code> and <code>ListBuffer</code> are subclasses of <code>scala.collection.GenSeq</code>, and the regular <code>TypeCheckedTripleEquals</code>
-provides equality constraints for the element types, both of which are <code>Int</code>. By contrast, this trait would not allow a <code>Vector[Int]</code> to be compared against a
-<code>ListBuffer[java.util.Date]</code>, because no equality constraint will exist between the element types <code>Int</code> and <code>Date</code>:
-</p>
-
-<pre class="stExamples">
-scala&gt; import java.util.Date
-import java.util.Date
-
-scala&gt; Vector(1, 2) === ListBuffer(new Date, new Date)
-&lt;console&gt;:20: error: types scala.collection.immutable.Vector[Int] and
-  scala.collection.mutable.ListBuffer[java.util.Date] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.Vector[Int],
-  scala.collection.mutable.ListBuffer[java.util.Date]]
-              Vector(1, 2) === ListBuffer(new Date, new Date)
-                           ^
-</pre>
-
-<p>
-This trait simply mixes together <a href="#SeqEqualityConstraints"><code>SeqEqualityConstraints</code></a>,
-<a href="#SetEqualityConstraints"><code>SetEqualityConstraints</code></a>,
-and <a href="#MapEqualityConstraints"><code>MapEqualityConstraints</code></a>. For more information and examples,
-therefore, see the main documentation of those traits below.
-</p>
-
-<a name="SeqEqualityConstraints"></a>
-<h2>SeqEqualityConstraints</h2>
-
-<p>
-Provides an implicit method that loosens the equality constraint defined by <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>
-for Scala <code>Seq</code>s to one that more closely matches Scala's approach to <code>Seq</code> equality.
-</p>
-
-<p>
-Scala's approach to <code>Seq</code> equality is that if both objects being compared are <code>Seq</code>s, the elements are compared to determine equality.
-This means you could compare an immutable <code>Vector</code> and a mutable <code>ListBuffer</code> for equality, for instance, and get true so long as the
-two <code>Seq</code>s contained the same elements in the same order. Here's an example:
-</p>
-
-<pre class="stExamples">
-scala&gt; import scala.collection.mutable.ListBuffer
-import scala.collection.mutable.ListBuffer
-
-scala&gt; Vector(1, 2) == ListBuffer(1, 2)
-res0: Boolean = true
-</pre>
-
-<p>
-Such a comparison would not, however, compile if you used <code>===</code> under either <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>,
-because <code>Vector</code> and <code>ListBuffer</code> are not in a subtype/supertype relationship, nor does an implicit conversion by default exist between them:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedTripleEquals._
-
-scala&gt; Vector(1, 2) === ListBuffer(1, 2)
-&lt;console&gt;:16: error: types scala.collection.immutable.Vector[Int] and
-  scala.collection.mutable.ListBuffer[Int] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.Vector[Int],
-  scala.collection.mutable.ListBuffer[Int]]
-              Vector(1, 2) === ListBuffer(1, 2)
-                           ^
-</pre>
-
-<p>
-If you mix or import the implicit conversion provided by <code>SeqEqualityConstraint</code>, however, the comparison will be allowed:
-</p>
-
-<pre class="stExamples">
-scala&gt; import SeqEqualityConstraints._
-import SeqEqualityConstraints._
-
-scala&gt; Vector(1, 2) === ListBuffer(1, 2)
-res2: Boolean = true
-</pre>
-
-<p>
-The equality constraint provided by this trait requires that both left and right sides are subclasses of <code>scala.collection.GenSeq</code> and that
-an <code>EqualityConstraint</code> can be found for the element types. In the example above, both the <code>Vector</code> and
-<code>ListBuffer</code> are subclasses of <code>scala.collection.GenSeq</code>, and the regular <code>TypeCheckedTripleEquals</code> provides equality
-constraints for the element types, both of which are <code>Int</code>. By contrast, this
-trait would not allow a <code>Vector[Int]</code> to be compared against a <code>ListBuffer[java.util.Date]</code>, because no equality constraint
-will exist between the element types <code>Int</code> and <code>Date</code>:
-</p>
-
-<pre class="stExamples">
-scala&gt; import java.util.Date
-import java.util.Date
-
-scala&gt; Vector(1, 2) === ListBuffer(new Date, new Date)
-&lt;console&gt;:20: error: types scala.collection.immutable.Vector[Int] and
-  scala.collection.mutable.ListBuffer[java.util.Date] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.Vector[Int],
-  scala.collection.mutable.ListBuffer[java.util.Date]]
-              Vector(1, 2) === ListBuffer(new Date, new Date)
-                           ^
-</pre>
-
-<a name="SetEqualityConstraints"></a>
-<h2>SetEqualityConstraints</h2>
-
-<p>
-Provides an implicit method that loosens the equality constraint defined by <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>
-for Scala <code>Set</code>s to one that more closely matches Scala's approach to <code>Set</code> equality.
-</p>
-
-<p>
-Scala's approach to <code>Set</code> equality is that if both objects being compared are <code>Set</code>s, the elements are compared to determine equality.
-This means you could compare an immutable <code>TreeSet</code> and a mutable <code>HashSet</code> for equality, for instance, and get true so long as the
-two <code>Set</code>s contained the same elements in the same order. Here's an example:
-</p>
-
-<pre class="stExamples">
-scala&gt; import scala.collection.immutable.TreeSet
-import scala.collection.immutable.TreeSet
-
-scala&gt; import scala.collection.mutable.HashSet
-import scala.collection.mutable.HashSet
-
-scala&gt; TreeSet(1, 2) == HashSet(1, 2)
-res0: Boolean = true
-</pre>
-
-<p>
-Such a comparison would not, however, compile if you used <code>===</code> under either <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>,
-because <code>TreeSet</code> and <code>HashSet</code> are not in a subtype/supertype relationship, nor does an implicit conversion by default exist between them:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedTripleEquals._
-
-scala&gt; TreeSet(1, 2) === HashSet(1, 2)
-&lt;console&gt;:16: error: types scala.collection.immutable.TreeSet[Int] and
-  scala.collection.mutable.HashSet[Int] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.TreeSet[Int],
-  scala.collection.mutable.HashSet[Int]]
-              TreeSet(1, 2) === HashSet(1, 2)
+scala&gt; List(1, 2, 3) === Vector("1", "2", "3")
+&lt;console&gt;:17: error: types List[Int] and scala.collection.immutable.Vector[String] do not adhere to the type constraint
+    selected for the === and !== operators; the missing implicit parameter is of type 
+    org.scalautils.Constraint[List[Int],scala.collection.immutable.Vector[String]]
+              List(1, 2, 3) === Vector("1", "2", "3")
                             ^
 </pre>
 
 <p>
-If you mix or import the implicit conversion provided by <code>SetEqualityConstraint</code>, however, the comparison will be allowed:
+The last example doesn't compile because no equality constraint exists between the element types, <code>Int</code> and <code>String</code>.
+Most often the constraints provided by ScalaUtils will be all you need, but if you do find yourself struggling with over-protective
+type errors, you can look at <code>TraversableEqualityConstraints</code> for examples of how to provide <code>Constraint</code>s for
+your own types.
 </p>
-
-<pre class="stExamples">
-scala&gt; import SetEqualityConstraints._
-import SetEqualityConstraints._
-
-scala&gt; TreeSet(1, 2) === HashSet(1, 2)
-res2: Boolean = true
-</pre>
-
-<p>
-The equality constraint provided by this trait requires that both left and right sides are subclasses of <code>scala.collection.GenSet</code> and that
-an <code>EqualityConstraint</code> can be found for the element types. In the example above, both the <code>TreeSet</code> and
-<code>HashSet</code> are subclasses of <code>scala.collection.GenSet</code>, and the regular <code>TypeCheckedTripleEquals</code> provides equality
-constraints for the element types, both of which are <code>Int</code>. By contrast, this
-trait would not allow a <code>TreeSet[Int]</code> to be compared against a <code>HashSet[java.util.Date]</code>, because no equality constraint
-will exist between the element types <code>Int</code> and <code>Date</code>:
-</p>
-
-<pre class="stExamples">
-scala&gt; import java.util.Date
-import java.util.Date
-
-scala&gt; TreeSet(1, 2) === HashSet(new Date, new Date)
-&lt;console&gt;:20: error: types scala.collection.immutable.TreeSet[Int] and
-  scala.collection.mutable.HashSet[java.util.Date] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.TreeSet[Int],
-  scala.collection.mutable.HashSet[java.util.Date]]
-              TreeSet(1, 2) === HashSet(new Date, new Date)
-                            ^
-</pre>
-
-<a name="MapEqualityConstraints"></a>
-<h2>MapEqualityConstraints</h2>
-
-<p>
-Provides an implicit method that loosens the equality constraint defined by <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>
-for Scala <code>Map</code>s to one that more closely matches Scala's approach to <code>Map</code> equality.
-</p>
-
-<p>
-Scala's approach to <code>Map</code> equality is that if both objects being compared are <code>Map</code>s, the elements are compared to determine equality.
-This means you could compare an immutable <code>TreeMap</code> and a mutable <code>HashMap</code> for equality, for instance, and get true so long as the two maps
-contained the same key-value mappings. Here's an example:
-</p>
-
-<pre class="stExamples">
-scala&gt; import scala.collection.immutable.TreeMap
-import scala.collection.immutable.TreeMap
-
-scala&gt; import scala.collection.mutable.HashMap
-import scala.collection.mutable.HashMap
-
-scala&gt; TreeMap("one" -&gt; 1, "two" -&gt; 2) == HashMap("one" -&gt; 1, "two" -&gt; 2)
-res0: Boolean = true
-</pre>
-
-<p>
-Such a comparison would not, however, compile if you used <code>===</code> under either <code>TypeCheckedTripleEquals</code> or <code>ConversionCheckedTripleEquals</code>,
-because <code>TreeMap</code> and <code>HashMap</code> are not in a subtype/supertype relationship, nor does an implicit conversion by default exist between them:
-</p>
-
-<pre class="stExamples">
-scala&gt; import org.scalautils._
-import org.scalautils._
-
-scala&gt; import TypeCheckedTripleEquals._
-import TypeCheckedTripleEquals._
-
-scala&gt; TreeMap("one" -&gt; 1, "two" -&gt; 2) === HashMap("one" -&gt; 1, "two" -&gt; 2)
-&lt;console&gt;:16: error: types scala.collection.immutable.TreeMap[String,Int] and
-  scala.collection.mutable.HashMap[String,Int] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.TreeMap[String,Int],
-  scala.collection.mutable.HashMap[String,Int]]
-              TreeMap("one" -&gt; 1, "two" -&gt; 2) === HashMap("one" -&gt; 1, "two" -&gt; 2)
-                                              ^
-</pre>
-
-<p>
-If you mix or import the implicit conversion provided by <code>MapEqualityConstraint</code>, however, the comparison will be allowed:
-</p>
-
-<pre class="stExamples">
-scala&gt; import MapEqualityConstraints._
-import MapEqualityConstraints._
-
-scala&gt; TreeMap("one" -&gt; 1, "two" -&gt; 2) === HashMap("one" -&gt; 1, "two" -&gt; 2)
-res2: Boolean = true
-</pre>
-
-<p>
-The equality constraint provided by this trait requires that both left and right sides are subclasses of <code>scala.collection.GenMap</code> and that
-an <code>EqualityConstraint</code> can be found for both key types and both value types. In the example above, both the <code>TreeMap</code> and
-<code>HashMap</code> are subclasses of <code>scala.collection.GenMap</code>, and the regular <code>TypeCheckedTripleEquals</code> provides equality
-constraints for the key types, both of which are <code>String</code>, and value types, both of which are <code>Int</code>. By contrast, this
-trait would not allow a <code>TreeMap[String, Int]</code> to be compared against a <code>HashMap[String, java.util.Date]</code>, because no equality constraint
-will exist between the value types <code>Int</code> and <code>Date</code>:
-</p>
-
-<pre class="stExamples">
-scala&gt; import java.util.Date
-import java.util.Date
-
-scala&gt; TreeMap("one" -&gt; 1, "two" -&gt; 2) === HashMap("one" -&gt; new Date, "two" -&gt; new Date)
-&lt;console&gt;:20: error: types scala.collection.immutable.TreeMap[String,Int] and
-  scala.collection.mutable.HashMap[String,java.util.Date] do not adhere to the equality constraint selected for
-  the === and !== operators; the missing implicit parameter is of type
-  org.scalautils.EqualityConstraint[scala.collection.immutable.TreeMap[String,Int],
-  scala.collection.mutable.HashMap[String,java.util.Date]]
-              TreeMap("one" -&gt; 1, "two" -&gt; 2) === HashMap("one" -&gt; new Date, "two" -&gt; new Date)
-                                              ^
-</pre>
 
 <p>
 Next, learn about <a href="@routes.UserGuide.tolerance.url">Tolerance</a>.
