@@ -21,11 +21,10 @@
 
 <h1>Or and Every</h1>
 
-<a name="Or"></a>
-<h2>Or</h2>
-
 <p>
-Represents a value that is one of two possible types, with one type being &ldquo;good&rdquo; and
+The <code>Or</code> and <code>Every</code> types of ScalaUtils allow you to represent errors as an alternate return
+value (like <code>Either</code>) and to optionally accumulate errors.
+<code>Or</code> represents a value that is one of two possible types, with one type being &ldquo;good&rdquo; and
 the other &ldquo;bad.&rdquo;
 </p>
 
@@ -383,6 +382,8 @@ parsePerson("", "")
 Note that in the last example, the <code>Bad</code> contains an error message for both name and age.
 </p>
 
+XXX
+
 <h2>Other ways to accumulate errors</h2>
 
 <p>
@@ -572,25 +573,6 @@ res6: org.scalautils.Or[AnyVal,String] = Good(3)
 scala&gt; Bad("oops"): Int Or ErrorMessage
 res7: org.scalautils.Or[Int,org.scalautils.ErrorMessage] = Bad(oops)
 </pre>
-
-<p>
-<em>Note: The <code>Or</code> hierarchy was inspired in part by the disjoint union (<code>\/</code>) and <code>Validation</code> types of
-<a href="http://github.com/scalaz/scalaz/" target="_blank"><code>scalaz</code></a>, the <code>ProcessResult</code> type of
-<a href="https://github.com/typesafehub/activator/" target="_blank">Typesafe Activator</a>, and the <code>Result</code> type of
-<a href="https://github.com/vpatryshev/ScalaKittens" target="_blank">ScalaKittens</a>.</em>
-</p>
-
-<h2>Every</h2>
-
-<p>
-An ordered, immutable, non-empty collection of elements.
-</p>
-
-<p>
-Class <code>Every</code> has two and only two subtypes: <a href="@{latestScaladoc}/#org.scalautils.One" target="_blank"><code>One</code></a> and <a href="@{latestScaladoc}/#org.scalautils.Many" target="_blank"><code>Many</code></a>.
-A <code>One</code> contains exactly one element. A <code>Many</code> contains two or more elements. Thus no way exists for an
-<code>Every</code> to contain zero elements.
-</p>
 
 <h2>Constructing <code>Every</code>s</h2>
 

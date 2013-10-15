@@ -22,15 +22,15 @@
 <h1>The Explicitly DSL</h1>
 
 <p>
-Provides ScalaTest's &ldquo;explicitly DSL,&rdquo; which facilitates the
-explicit specification of an <code>Equality[T]</code> or a <code>Uniformity[T]</code> where
-<code>Equality[T]</code> is taken implicitly.
+ScalaUtils' <a href="@{latestScaladoc}/#org.scalautils.Explicitly"><code>Explicitly</code></a> trait provides the &ldquo;explicitly DSL,&rdquo; which facilitates the
+explicit specification of an <a href="@{latestScaladoc}/#org.scalautils.Equality"><code>Equality[T]</code></a> or a
+<a href="@{latestScaladoc}/#org.scalautils.Uniformity"><code>Uniformity[T]</code></a> where <code>Equality[T]</code> is taken implicitly.
 </p>
 
 <p>
 The Explicitly DSL can be used with the <code>===</code> and <code>!==</code> operators of ScalaUtils
 as well as the <code>should</code> <code>equal</code>, <code>be</code>, <code>contain</code>, and
-<code>===</code> syntax of ScalaTest matchers.
+<code>===</code> syntax of <a href="@{latestScaladoc}/#org.scalatest.Matchers">ScalaTest matchers</a>.
 </p>
 
 <p>
@@ -53,8 +53,8 @@ result should equal ("hello") (decided by defaultEquality)
 
 <p>
 The explicitly DSL also provides support for specifying a one-off equality that is based on a normalization. For
-example, ScalaUtils offers a <a href="@{latestScaladoc}/#org.scalautils.StringNormalizations" target="_blank"><code>StringNormalizations</code></a>
-trait that provides methods such as <code>trimmed</code> and <code>lowerCased</code> that return <code>Normalization[String]</code>
+example, ScalaUtils offers a <a href="@{latestScaladoc}/#org.scalautils.StringNormalizations"><code>StringNormalizations</code></a>
+trait that provides methods such as <code>trimmed</code> and <code>lowerCased</code> that return <code>Uniformity[String]</code>
 instances that normalize by trimming and lower-casing, respectively. If you bring those into scope by mixing in or importing the
 members of <code>StringNormalizations</code>, you could use the explicitly DSL like this:
 </p>

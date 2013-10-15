@@ -15,6 +15,7 @@
 *@
 
 @import controllers.Application.milestoneScaladoc
+@import controllers.Application.latestScaladoc
 
 @userGuidePage("Tolerance") {
 <div style="text-align: left">
@@ -22,8 +23,9 @@
 <h1>Tolerance</h1>
 
 <p>
-Trait containing an implicit conversion that adds a <code>+-</code> method to <code>Numeric</code> types, which enables
-spreads to be expressed in terms of a <em>pivot</em> and <em>tolerance</em>.
+The <a href="@{latestScaladoc}/#org.scalautils.Tolerance"><code>Tolerance</code></a> trait containing an implicit conversion that adds
+a <code>+-</code> method to <code>Numeric</code> types, which, combined with one of the <code>TripleEquals</code> traits,  enables
+you to determine whether the numeric value is with a tolerance.
 </p>
 
 <p>
@@ -32,7 +34,31 @@ For example, the <code>TripleEquals</code> trait (and its type-checking siblings
 </p>
 
 <pre class="stHighlighted">
-a === (1.0 +- 0.1)
+result === 10.0 +- 0.5
+</pre>
+
+<p>
+Here are some examples in the Scala interpreter:
+</p>
+
+<pre class="stExamples">
+scala&gt; import org.scalautils._
+import org.scalautils._
+
+scala&gt; import TripleEquals._
+import TripleEquals._
+
+scala&gt; import Tolerance._
+import Tolerance._
+
+scala&gt; val result = 2.000001
+result: Double = 2.000001
+
+scala&gt; result === 2.0 +- .001
+res0: Boolean = true
+
+scala&gt; result === 2.0 +- .000000001
+res1: Boolean = false
 </pre>
 
 <p>
