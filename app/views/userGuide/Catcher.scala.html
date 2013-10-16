@@ -22,13 +22,14 @@
 <h1>Catcher</h1>
 
 <p>
-Convenience class for extractors that match and return <code>Throwable</code>s based on a type and <code>Boolean</code> condition.
+The ScalaUtils <code>Catcher</code> class is an extractor that matches and returns <code>Throwable</code>s based on a type and <code>Boolean</code> condition.
+<code>Catcher</code> was motivated by the need to catch
+and handle exceptions based on more than just the exception's type as a strategy for dealing with
+"flickering" tests&#8212;tests that usually pass, but occasionally fail.
 </p>
 
 <p>
-Class <code>Catcher</code> was motivated by the need to catch
-and handle exceptions based on more than just the exception's type as a strategy for dealing with
-"flickering" tests&#8212;tests that usually pass, but occasionally fail. The best strategy for dealing with
+The best strategy for dealing with
 flickers is to fix the test such that they stop flickering, but sometimes that is not practical. In
 such cases allowing the test to continue flickering can distract the team by requiring them to
 spend time inspecting failures to determine whether or not they are flickers or real failures that need
