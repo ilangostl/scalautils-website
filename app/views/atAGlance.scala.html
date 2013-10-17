@@ -1,0 +1,348 @@
+@*
+* Copyright 2010-2013 Artima, Inc.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*     http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*@
+
+@import controllers.Application.milestoneScaladoc
+
+@fullPage("At A Glance") {
+<div style="text-align: left">
+
+<h1>ScalaUtils At A Glance</h1>
+
+<table style="border-collapse: collapse; border: 1px solid black">
+
+<tr>
+<th class="ataglance" colspan="4">Equality</th>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._</span>
+Array(1, 2, 3) === Array(1, 2, 3)</pre>
+</td>
+<td class="ataglance" colspan="2">Use default <a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality"><code>Equality</code></a> to check equality of two <code>Array</code>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._</span>
+Array(1, 2, 3) !== Array(1, 2, 8)</pre>
+</td>
+<td class="ataglance" colspan="2">Use default <a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality"><code>Equality</code></a> to check inequality of two <code>Array</code>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._</span>
+Array(1, 2, 3) === List(1, 2, 3)</pre>
+</td>
+<td class="ataglance" colspan="2">Use default <a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality"><code>Equality</code></a> to check equality of an <code>Array</code> and a <code>List</code>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._
+import Tolerance._</span>
+<span class="stReserved">case</span> <span class="stReserved">class</span> <span class="stType">Person</span>(name: <span class="stType">String</span>, age: <span class="stType">Double</span>)
+<span class="stReserved">implicit</span> <span class="stReserved">val</span> personEq =
+  <span class="stReserved">new</span> <span class="stType">Equality</span>[<span class="stReserved">Person</span>] {
+    <span class="stReserved">def</span> areEqual(a: <span class="stType">Person</span>, b: <span class="stType">Any</span>): Boolean =
+      b <span class="stReserved">match</span> {
+        <span class="stReserved">case</span> p: <span class="stType">Person</span> => a.name == p.name && a.age === p.age +- 0.0002
+        <span class="stReserved">case</span> _ => <span class="stReserved">false</span>
+      }
+  }
+<span class="stType">Person</span>(<span class="stLiteral">"Joe"</span>, <span class="stLiteral">29.0001</span>) === <span class="stType">Person</span>(<span class="stLiteral">"Joe"</span>, <span class="stLiteral">29.0</span>)</pre>
+</td>
+<td class="ataglance" colspan="2">Define custom <a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality"><code>Equality</code></a> typeclass to define alternate notions of equality for specified types that can be used with ScalaUtils' === and !== syntax.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TypeCheckedTripleEquals._</span>
+<span class="stLineComment">// 1 === 1L will now fail to compile, you'll need to say:</span>
+<span class="stLiteral">1L</span> === <span class="stLiteral">1L</span></pre>
+</td>
+<td class="ataglance" colspan="2">Use <a href="@{milestoneScaladoc}/index.html#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a> to enforce left and right hand side of <code>===</code> has correct type.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TypeCheckedTripleEquals._</span>
+<span class="stLiteral">1</span> === (<span class="stLiteral">1L</span>: <span class="stType">AnyVal</span>)</pre>
+</td>
+<td class="ataglance" colspan="2">Trick to loosen <a href="@{milestoneScaladoc}/index.html#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a> enforcement, when you really need to.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import ConversionCheckedTripleEquals._</span>
+<span class="stLiteral">1L</span> === <span class="stLiteral">1</span></pre>
+</td>
+<td class="ataglance" colspan="2">Use <a href="@{milestoneScaladoc}/index.html#org.scalautils.ConversionCheckedTripleEquals"><code>ConversionCheckedTripleEquals</code></a> to enforce left and right hand side of <code>===</code> has correct type, it is different from <a href="@{milestoneScaladoc}/index.html#org.scalautils.TypeCheckedTripleEquals"><code>TypeCheckedTripleEquals</code></a> in that it will try available implicit conversions to make left and right hand side to have a correct type.</td>
+</tr>
+
+<tr>
+<th class="ataglance" colspan="4">Tolerance</th>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._
+import Tolerance._</span>
+<span class="stLiteral">2.000001</span> === <span class="stLiteral">2.0</span> +- <span class="stLiteral">.001</span></pre>
+</td>
+<td class="ataglance" colspan="2">Use <a href="@{milestoneScaladoc}/index.html#org.scalautils.Tolerance"><code>Tolerance</code></a> to check for equality which takes a level of tolerance into account.</td>
+</tr>
+
+<tr>
+<th class="ataglance" colspan="4">Normalization</th>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TypeCheckedTripleEquals._
+import Explicitly._</span>
+<span class="stReserved">val</span> truncated =
+  <span class="stReserved">new</span> <span class="stType">Normalization</span>[<span class="stType">Double</span>] {
+    <span class="stReserved">def</span> normalized(d: <span class="stType">Double</span>) = d.floor
+  }
+(<span class="stLiteral">2.1</span> === (<span class="stLiteral">2.0</span>)) (after being truncated)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Define custom <a href="@{milestoneScaladoc}/index.html#org.scalautils.Normalization"><code>Normalization</code></a> and use it in <a href="@routes.UserGuide.explicitly.url">The Explicitly DSL</a>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TypeCheckedTripleEquals._
+import Explicitly._</span>
+<span class="stReserved">val</span> truncated =
+  <span class="stReserved">new</span> <span class="stType">Uniformity</span>[<span class="stReserved">Double</span>] {
+    <span class="stReserved">def</span> normalized(d: <span class="stType">Double</span>) = d.floor
+    <span class="stReserved">def</span> normalizedCanHandle(o: <span class="stType">Any</span>) = o.isInstanceOf[<span class="stType">Double</span>]
+    <span class="stReserved">def</span> normalizedOrSame(o: <span class="stType">Any</span>): <span class="stType">Any</span> =
+      o <span class="stReserved">match</span> {
+        <span class="stReserved">case</span> d: <span class="stType">Double</span> => normalized(d)
+        <span class="stType">case</span> _ => o
+      }
+  }
+(<span class="stLiteral">2.1</span> === (<span class="stLiteral">2.0</span>)) (after being truncated)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Define custom <a href="@{milestoneScaladoc}/index.html#org.scalautils.Normalization"><code>Normalization</code></a> and use it in <a href="@routes.UserGuide.explicitly.url">The Explicitly DSL</a>.</td>
+</tr>
+
+<tr>
+<th class="ataglance" colspan="4">The Explicitly DSL</th>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._
+import Explicitly._</span>
+<span class="stReserved">case</span> <span class="stReserved">class</span> <span class="stType">Person</span>(name: <span class="stType">String</span>, age: <span class="stType">Double</span>)
+<span class="stReserved">val</span> personEq =
+  <span class="stReserved">new</span> <span class="stType">Equality</span>[<span class="stReserved">Person</span>] {
+    <span class="stReserved">def</span> areEqual(a: <span class="stType">Person</span>, b: <span class="stType">Any</span>): Boolean =
+      b <span class="stReserved">match</span> {
+        <span class="stReserved">case</span> p: <span class="stType">Person</span> => a.name == p.name && a.age === p.age +- 0.0002
+        <span class="stReserved">case</span> _ => <span class="stReserved">false</span>
+      }
+  }
+(<span class="stType">Person</span>(<span class="stLiteral">"Joe"</span>, <span class="stLiteral">29.0001</span>) === <span class="stType">Person</span>(<span class="stLiteral">"Joe"</span>, <span class="stLiteral">29.0</span>)) (decided by personEq)</pre>
+</td>
+<td class="ataglance" colspan="2">Explicitly specify to use the custom <a href="@{milestoneScaladoc}/index.html#org.scalautils.Equality"><code>Equality</code></a> by using <code>decided</code> <code>by</code>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import TripleEquals._
+import Explicitly._
+import StringNormalizations._</span>
+("HellO" === "hello")(after being lowerCased)</pre>
+</td>
+<td class="ataglance" colspan="2">Explicitly specify to use <code>lowerCased</code> <a href="@{milestoneScaladoc}/index.html#org.scalautils.Uniformity"><code>Uniformity</code></a> by using <code>after</code> <code>being</code>.</td>
+</tr>
+
+<tr>
+<th class="ataglance" colspan="4">Or and Every</th>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+type <span class="stType">ErrorMessage</span> = <span class="stType">String</span>
+<span class="stReserved">def</span> parseName(input: <span class="stType">String</span>): <span class="stType">String</span> Or <span class="stType">ErrorMessage</span> = {
+  <span class="stReserved">val</span> trimmed = input.trim
+  <span class="stReserved">if</span> (!trimmed.isEmpty) <span class="stType">Good</span>(trimmed) else <span class="stType">Bad</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid name&quot;&quot;&quot;</span>)
+}</pre>
+</td>
+<td class="ataglance" colspan="2">Use <a href="@{milestoneScaladoc}/index.html#org.scalautils.Or"><code>Or</code></a> as better and clearer alternatives for <code>Either</code>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import Accumulation._</span>
+type <span class="stType">ErrorMessage</span> = <span class="stType">String</span>
+<span class="stReserved">case</span> <span class="stReserved">class</span> <span class="stType">Person</span>(name: <span class="stType">String</span>, age: <span class="stType">Int</span>)
+<span class="stReserved">def</span> parseName(input: <span class="stType">String</span>): <span class="stType">String</span> Or <span class="stType">One[ErrorMessage]</span> = {
+  <span class="stReserved">val</span> trimmed = input.trim
+  <span class="stReserved">if</span> (!trimmed.isEmpty) <span class="stType">Good</span>(trimmed) else <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid name&quot;&quot;&quot;</span>))
+}
+<span class="stReserved">def</span> parseAge(input: <span class="stType">String</span>): <span class="stType">Int</span> Or <span class="stType">One</span>[<span class="stType">ErrorMessage</span>] = {
+  <span class="stReserved">try</span> {
+    <span class="stReserved">val</span> age = input.trim.toInt
+    <span class="stReserved">if</span> (age >= <span class="stLiteral">0</span>) <span class="stType">Good</span>(age) <span class="stReserved">else</span> <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${age}&quot; is not a valid age&quot;&quot;&quot;</span>))
+  }
+  <span class="stReserved">catch</span> {
+    <span class="stReserved">case</span> _: <span class="stType">NumberFormatException</span> => <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid integer&quot;&quot;&quot;</span>))
+  }
+}
+<span class="stReserved">def</span> parsePerson(inputName: <span class="stType">String</span>, inputAge: <span class="stType">String</span>): <span class="stType">Person</span> Or <span class="stType">Every</span>[<span class="stType">ErrorMessage</span>] = {
+  <span class="stReserved">val</span> name = parseName(inputName)
+  <span class="stReserved">val</span> age = parseAge(inputAge)
+  withGood(name, age) { <span class="stType">Person</span>(_, _) }
+}</pre>
+</td>
+<td class="ataglance" colspan="2">Use <a href="@{milestoneScaladoc}/index.html#org.scalautils.Every"><code>Every</code></a> and <a href="@{milestoneScaladoc}/index.html#org.scalautils.Accumulation"><code>Accumulation</code></a> to accumulate error messages.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+<span class="stReserved">val</span> one = <span class="stType">One</span>(8)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Create an instance of <a href="@{milestoneScaladoc}/index.html#org.scalautils.One"><code>One</code></a>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+<span class="stReserved">val</span> many = <span class="stType">Many</span>(1, 2, 3)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Create an instance of <a href="@{milestoneScaladoc}/index.html#org.scalautils.Many"><code>Many</code></a>.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+<span class="stReserved">val</span> one = <span class="stType">Every</span>(8)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Create an instance of <a href="@{milestoneScaladoc}/index.html#org.scalautils.One"><code>One</code></a> using <a href="@{milestoneScaladoc}/index.html#org.scalautils.Every"><code>Every</code></a> factory method.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+<span class="stReserved">val</span> many = <span class="stType">Every</span>(1, 2, 3)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Create an instance of <a href="@{milestoneScaladoc}/index.html#org.scalautils.Many"><code>Many</code></a> using <a href="@{milestoneScaladoc}/index.html#org.scalautils.Every"><code>Every</code></a> factory method.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import Accumulation._</span>
+type <span class="stType">ErrorMessage</span> = <span class="stType">String</span>
+<span class="stReserved">def</span> parseName(input: <span class="stType">String</span>): <span class="stType">String</span> Or <span class="">One</span>[<span class="stType">ErrorMessage</span>] = {
+  <span class="stReserved">val</span> trimmed = input.trim
+  <span class="stReserved">if</span> (!trimmed.isEmpty) <span class="stType">Good</span>(trimmed) else <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid name&quot;&quot;&quot;</span>))
+}
+<span class="stReserved">val</span> nameList = <span class="stType">List</span>(parseName(<span class="stLiteral">"John"</span>), parseName(<span class="stLiteral">"Sally"</span>), parseName(<span class="stLiteral">"Bob"</span>)).combined</pre>
+</td>
+<td class="ataglance" colspan="2">Use <code>combined</code> to accumulate error messages.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import Accumulation._</span>
+type <span class="stType">ErrorMessage</span> = <span class="stType">String</span>
+<span class="stReserved">def</span> parseName(input: <span class="stType">String</span>): <span class="stType">String</span> Or <span class="">One</span>[<span class="stType">ErrorMessage</span>] = {
+  <span class="stReserved">val</span> trimmed = input.trim
+  <span class="stReserved">if</span> (!trimmed.isEmpty) <span class="stType">Good</span>(trimmed) else <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid name&quot;&quot;&quot;</span>))
+}
+<span class="stReserved">val</span> nameList = <span class="stType">List</span>(<span class="stLiteral">"John"</span>, <span class="stLiteral">"Sally"</span>, <span class="stLiteral">"Bob"</span>).validatedBy(parseName)</pre>
+</td>
+<td class="ataglance" colspan="2">Use <code>validatedBy</code> to accumulate error messages.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._
+import Accumulation._</span>
+type <span class="stType">ErrorMessage</span> = <span class="stType">String</span>
+<span class="stReserved">def</span> parseName(input: <span class="stType">String</span>): <span class="stType">String</span> Or <span class="stType">One[ErrorMessage]</span> = {
+  <span class="stReserved">val</span> trimmed = input.trim
+  <span class="stReserved">if</span> (!trimmed.isEmpty) <span class="stType">Good</span>(trimmed) else <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid name&quot;&quot;&quot;</span>))
+}
+<span class="stReserved">def</span> parseAge(input: <span class="stType">String</span>): <span class="stType">Int</span> Or <span class="stType">One</span>[<span class="stType">ErrorMessage</span>] = {
+  <span class="stReserved">try</span> {
+    <span class="stReserved">val</span> age = input.trim.toInt
+    <span class="stReserved">if</span> (age >= <span class="stLiteral">0</span>) <span class="stType">Good</span>(age) <span class="stReserved">else</span> <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${age}&quot; is not a valid age&quot;&quot;&quot;</span>))
+  }
+  <span class="stReserved">catch</span> {
+    <span class="stReserved">case</span> _: <span class="stType">NumberFormatException</span> => <span class="stType">Bad</span>(<span class="stType">One</span>(s<span class="stLiteral">&quot;&quot;&quot;&quot;${input}&quot; is not a valid integer&quot;&quot;&quot;</span>))
+  }
+}
+parseName(<span class="stLiteral">"Dude"</span>) zip parseAge(<span class="stLiteral">"21"</span>)</pre>
+</td>
+<td class="ataglance" colspan="2">Use <code>zip</code> to accumulate error messages.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+<span class="stType">Good</span>(<span class="stLiteral">3</span>).orBad[<span class="stType">String</span>]
+<span class="stLineComment">// or</span>
+<span class="stType">Good</span>[<span class="stType">AnyVal</span>, <span class="stType">String</span>](<span class="stLiteral">3</span>)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Give <code>Good</code> instance a good <code>Bad</code> type.</td>
+</tr>
+
+<tr>
+<td class="ataglance" colspan="2">
+<pre class="stTight"><span class="stImport">import org.scalautils._</span>
+<span class="stType">Good</span>[<span class="stType">Int</span>].orBad(<span class="stLiteral">"oops"</span>)
+<span class="stLineComment">// or</span>
+<span class="stType">Bad</span>[<span class="stType">Int</span>, <span class="stType">ErrorMessage</span>](<span class="stLiteral">"oops"</span>)
+</pre>
+</td>
+<td class="ataglance" colspan="2">Give <code>Bad</code> instance a good <code>Good</code> type.</td>
+</tr>
+
+</table>
+
+</div>
+}

@@ -13,6 +13,8 @@ GET        /release_notes                         controllers.ReleaseNotes.relea
 
 GET        /release_notes/2.0                     controllers.ReleaseNotes.v20
 
+GET        /at_a_glance                           controllers.Application.atAGlance
+
 GET        /user_guide/CustomEquality             controllers.UserGuide.customEquality
 GET        /user_guide/DefaultEquality            controllers.UserGuide.defaultEquality
 GET        /user_guide/ConstrainedEquality        controllers.UserGuide.constrainedEquality
