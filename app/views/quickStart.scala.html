@@ -16,8 +16,7 @@
 
 @import controllers.Application.latestScaladoc
 @import controllers.Application.latestVersion
-@import controllers.Application.milestoneVersion
-@import controllers.Application.milestoneJar
+@import controllers.Application.latestJar
 @import controllers.Application.majorMinorScalaVersion
 
 @nonHomePage("Quick Start") {
@@ -28,11 +27,11 @@
 
 <p>
 A good way to get started with ScalaUtils is to try out its type-checking <code>===</code> operator in the Scala interpreter.
-First start Scala 2.10, including <a href="@{milestoneJar}">this ScalaUtils Jar file</a> on the classpath:
+First start Scala 2.10, including <a href="@{latestJar}">this ScalaUtils Jar file</a> on the classpath:
 </p>
 
 <pre class="scala">
-$ scala -cp scalatest_@{majorMinorScalaVersion}-@{milestoneVersion}.jar
+$ scala -cp scalatest_@{majorMinorScalaVersion}-@{latestVersion}.jar
 Welcome to Scala version 2.10.3 (...).
 Type in expressions to have them evaluated.
 Type :help for more information.
@@ -214,7 +213,7 @@ To include ScalaUtils in your sbt project, simply add this line:
 </p>
 
 <pre class="stHighlighted">
-libraryDependencies += <span class="stQuotedString">"org.scalautils"</span> % <span class="stQuotedString">"scalautils_@{majorMinorScalaVersion}"</span> % <span class="stQuotedString">"@{milestoneVersion}"</span>
+libraryDependencies += <span class="stQuotedString">"org.scalautils"</span> % <span class="stQuotedString">"scalautils_@{majorMinorScalaVersion}"</span> % <span class="stQuotedString">"@{latestVersion}"</span>
 </pre>
 
 <p>
