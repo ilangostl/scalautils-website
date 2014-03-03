@@ -14,8 +14,7 @@
  * limitations under the License.
  *@
 
-@import controllers.Application.milestoneScaladoc
-@import controllers.Application.milestoneVersion
+@import controllers.Application.latestScaladoc
 
 @releaseNotesPage("ScalaUtils 2.1.0 Release Notes") {
 <div style="text-align: left">
@@ -28,6 +27,7 @@ the ScalaTest 2.1.0 release.
 For more information, see the
 <a href="http://scalatest.org/release_notes/2.1.0">release notes
 for ScalaTest 2.1.0</a>.
+For information on how to include ScalaUtils in your project, see the <a href="/download">download page</a>.
 </p>
 
 
@@ -35,18 +35,14 @@ for ScalaTest 2.1.0</a>.
 ScalaUtils 2.1.0 includes the following enhancements:
 </p>
 
-<p>
-For information on how to include ScalaUtils in your project, see the <a href="/download">download page</a>.
-</p>
-
 <a name="enhancements"></a>
 <h2>Enhancements</h2>
 
 <ul>
-<li>Enhanced default <a href="@{milestoneScaladoc}/index.html#org.scalautils.Prettifier"><code>Prettifier</code></a> to prettify objects inside Scala and Java collections, <code>Option</code>, <code>Either</code>, <code>Try</code>, and ScalaUtils' <a href="@{milestoneScaladoc}/index.html#org.scalautils.Or"><code>Or</code></a> and <a href="@{milestoneScaladoc}/index.html#org.scalautils.Every"><code>Every</code></a>.</li>
-<li>Added <code>badMap</code> and <code>fold</code> methods to <a href="@{milestoneScaladoc}/index.html#org.scalautils.Or"><code>Or</code></a>.</li>
-<li>Added a <code>toEquality</code> method on <a href="@{milestoneScaladoc}/index.html#org.scalautils.Uniformity"><code>Uniformity</code></a>
-and a <code>toEquivalence</code> method on <a href="@{milestoneScaladoc}/index.html#org.scalautils.Normalization"><code>Normalization</code></a> to provide a way
+<li>Enhanced default <a href="@{latestScaladoc}/index.html#org.scalautils.Prettifier"><code>Prettifier</code></a> to prettify objects inside Scala and Java collections, <code>Option</code>, <code>Either</code>, <code>Try</code>, and ScalaUtils' <a href="@{latestScaladoc}/index.html#org.scalautils.Or"><code>Or</code></a> and <a href="@{latestScaladoc}/index.html#org.scalautils.Every"><code>Every</code></a>.</li>
+<li>Added <code>badMap</code> and <code>fold</code> methods to <a href="@{latestScaladoc}/index.html#org.scalautils.Or"><code>Or</code></a>.</li>
+<li>Added a <code>toEquality</code> method on <a href="@{latestScaladoc}/index.html#org.scalautils.Uniformity"><code>Uniformity</code></a>
+and a <code>toEquivalence</code> method on <a href="@{latestScaladoc}/index.html#org.scalautils.Normalization"><code>Normalization</code></a> to provide a way
 to convert a normalization to an equality without using the <code>Explicitly</code> DSL. Modified Scaladoc documentation to include
 examples of explicitly specifying equality without using the <code>Explicitly</code> DSL, for people who prefer to avoid English-like DSLs in production code.</li>
 
