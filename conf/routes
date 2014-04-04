@@ -14,6 +14,7 @@ GET        /release_notes                         controllers.ReleaseNotes.relea
 GET        /release_notes/2.0                     controllers.ReleaseNotes.v20
 GET        /release_notes/2.1.0                   controllers.ReleaseNotes.v210
 GET        /release_notes/2.1.1                   controllers.ReleaseNotes.v211
+GET        /release_notes/2.1.2                   controllers.ReleaseNotes.v212
 
 GET        /user_guide/CustomEquality             controllers.UserGuide.customEquality
 GET        /user_guide/DefaultEquality            controllers.UserGuide.defaultEquality
