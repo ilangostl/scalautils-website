@@ -54,4 +54,8 @@ object Application extends Controller {
   def about = Action {
     Ok(views.html.about())
   }
+
+  def atAGlance = Action {
+    Ok(views.html.atAGlance())
+  }
 }
