@@ -55,16 +55,24 @@ The followings are needed for building ScalaTest/ScalaUtils:
 </p>
 
 <ul>
-  <li><a href="javascript:void(window.open('http://www.oracle.com/technetwork/java/javasebusiness/downloads/java-archive-downloads-javase6-419409.html', '_blank'))">JDK 6</a> (JDK 7 won't work currently)</li>
-  <li><a href="javascript:void(window.open('http://www.scala-sbt.org/0.13.0/docs/Getting-Started/Setup.html', '_blank'))">SBT 0.13.0</a></li>
+  <li>JDK 6, 7 or 8</li>
+  <li><a href="javascript:void(window.open('http://www.scala-sbt.org/0.13.1/docs/Getting-Started/Setup.html', '_blank'))">SBT 0.13.1</a></li>
 </ul>
 
 <p>
-and use the following options in your SBT launch file:
+for JDK 6 or 7, use the following options in your SBT launch file:
 </p>
 
 <p>
-<code>SBT_OPTS="-server -Xms512M -Xmx2048M -Dfile.encoding=UTF8 -Xss1M -XX:MaxPermSize=512M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:+DoEscapeAnalysis -XX:ReservedCodeCacheSize=64m"</code>
+<code>SBT_OPTS="-server -Xms512M -Xmx2000M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -XX:NewRatio=8 -XX:MaxPermSize=512M"</code>
+</p>
+
+<p>
+for JDK 8, use the following SBT options instead:
+</p>
+
+<p>
+<code>SBT_OPTS="-server -Xms512M -Xmx2000M -Xss1M  -XX:+UseConcMarkSweepGC -XX:NewRatio=8"</code>
 </p>
 
 <h3>Building and Running Tests</h3>
@@ -74,18 +82,38 @@ This command will build and run the regular tests:
 </p>
 
 <p>
-<code>$ sbt test</code>
+<code>$ sbt scalautils/test</code>
+</p>
+
+<h3>Packaging</h3>
+
+<p>
+You can package the ScalaUtils JAR file using this command:
 </p>
 
 <p>
-To run generated tests, you'll need to increase maximum heap size to <code>-Xmx3072M</code>, and use this command instead:
+<code>$ sbt scalautils/package</code>
 </p>
 
 <p>
-<code>$ sbt "project gentests" "test"</code>
+The resulting JAR file will be produced in <code>target/scala-2.10/</code>.
 </p>
 
-<p>What it does is simply switch to <code>gentests</code> project and run <code>test</code>.</p>
+<p>
+You can also publish it to your local Ivy repository using this command:
+</p>
+
+<p>
+<code>$ sbt scalautils/publishLocal</code>
+</p>
+
+<p>
+Or publish it to local maven repository using this command:
+</p>
+
+<p>
+<code>$ sbt scalautils/publishM2</code>
+</p>
 
 <h2>Issues Reporting</h2>
 
